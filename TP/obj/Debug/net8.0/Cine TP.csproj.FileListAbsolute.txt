@@ -1,0 +1,42 @@
+C:\Users\provis920\source\repos\TP\TP\obj\Debug\net8.0\Cine TP.csproj.AssemblyReference.cache
+C:\Users\provis920\source\repos\TP\TP\obj\Debug\net8.0\Cine TP.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\provis920\source\repos\TP\TP\obj\Debug\net8.0\Cine TP.AssemblyInfoInputs.cache
+C:\Users\provis920\source\repos\TP\TP\obj\Debug\net8.0\Cine TP.AssemblyInfo.cs
+C:\Users\provis920\source\repos\TP\TP\obj\Debug\net8.0\Cine TP.csproj.CoreCompileInputs.cache
+C:\Users\provis920\source\repos\TP\TP\bin\Debug\net8.0\Cine TP.deps.json
+C:\Users\provis920\source\repos\TP\TP\bin\Debug\net8.0\Cine TP.runtimeconfig.json
+C:\Users\provis920\source\repos\TP\TP\bin\Debug\net8.0\Cine TP.dll
+C:\Users\provis920\source\repos\TP\TP\bin\Debug\net8.0\Cine TP.pdb
+C:\Users\provis920\source\repos\TP\TP\obj\Debug\net8.0\Cine TP.dll
+C:\Users\provis920\source\repos\TP\TP\obj\Debug\net8.0\refint\Cine TP.dll
+C:\Users\provis920\source\repos\TP\TP\obj\Debug\net8.0\Cine TP.pdb
+C:\Users\provis920\source\repos\TP\TP\obj\Debug\net8.0\Cine TP.genruntimeconfig.cache
+C:\Users\provis920\source\repos\TP\TP\obj\Debug\net8.0\ref\Cine TP.dll
+C:\Users\provis920\source\repos\Cine TP\TP\bin\Debug\net8.0\Cine TP.deps.json
+C:\Users\provis920\source\repos\Cine TP\TP\bin\Debug\net8.0\Cine TP.runtimeconfig.json
+C:\Users\provis920\source\repos\Cine TP\TP\bin\Debug\net8.0\Cine TP.dll
+C:\Users\provis920\source\repos\Cine TP\TP\bin\Debug\net8.0\Cine TP.pdb
+C:\Users\provis920\source\repos\Cine TP\TP\obj\Debug\net8.0\Cine TP.csproj.AssemblyReference.cache
+C:\Users\provis920\source\repos\Cine TP\TP\obj\Debug\net8.0\Cine TP.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\provis920\source\repos\Cine TP\TP\obj\Debug\net8.0\Cine TP.AssemblyInfoInputs.cache
+C:\Users\provis920\source\repos\Cine TP\TP\obj\Debug\net8.0\Cine TP.AssemblyInfo.cs
+C:\Users\provis920\source\repos\Cine TP\TP\obj\Debug\net8.0\Cine TP.csproj.CoreCompileInputs.cache
+C:\Users\provis920\source\repos\Cine TP\TP\obj\Debug\net8.0\Cine TP.dll
+C:\Users\provis920\source\repos\Cine TP\TP\obj\Debug\net8.0\refint\Cine TP.dll
+C:\Users\provis920\source\repos\Cine TP\TP\obj\Debug\net8.0\Cine TP.pdb
+C:\Users\provis920\source\repos\Cine TP\TP\obj\Debug\net8.0\Cine TP.genruntimeconfig.cache
+C:\Users\provis920\source\repos\Cine TP\TP\obj\Debug\net8.0\ref\Cine TP.dll
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\bin\Debug\net8.0\Cine TP.deps.json
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\bin\Debug\net8.0\Cine TP.runtimeconfig.json
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\bin\Debug\net8.0\Cine TP.dll
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\bin\Debug\net8.0\Cine TP.pdb
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\obj\Debug\net8.0\Cine TP.csproj.AssemblyReference.cache
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\obj\Debug\net8.0\Cine TP.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\obj\Debug\net8.0\Cine TP.AssemblyInfoInputs.cache
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\obj\Debug\net8.0\Cine TP.AssemblyInfo.cs
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\obj\Debug\net8.0\Cine TP.csproj.CoreCompileInputs.cache
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\obj\Debug\net8.0\Cine TP.dll
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\obj\Debug\net8.0\refint\Cine TP.dll
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\obj\Debug\net8.0\Cine TP.pdb
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\obj\Debug\net8.0\Cine TP.genruntimeconfig.cache
+C:\Users\provis920\Downloads\tp progra\TP\Cine TP Progra\TP\obj\Debug\net8.0\ref\Cine TP.dll
