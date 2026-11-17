@@ -11,7 +11,7 @@ namespace Cine_TP.Data.Interfaces
     {
         Task<List<Pelicula>> GetAllMoviesAsync();
         Task<Pelicula?> GetMovieByIdAsync(int id);
-        Task<List<Pelicula?>> GetMovieByNameAsync(string nombrePelicula);
+        Task<List<Pelicula>> GetMovieByNameAsync(string nombrePelicula);
         Task<bool> CreateMovieAsync(Pelicula pelicula);
         Task<bool> UpdateMovieStateAsync(int id, string estado);
         Task<bool> UpdateMovieAsync(int id, Pelicula pelicula);

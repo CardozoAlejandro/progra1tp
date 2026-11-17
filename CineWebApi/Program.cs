@@ -65,6 +65,7 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 // Registrar Servicios
 builder.Services.AddScoped<IComprobanteService, ComprobanteService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPeliculaService, PeliculaService>();
 
 builder.Services.AddAuthorization();
 // Agregar controladores y OpenAPI/Swagger

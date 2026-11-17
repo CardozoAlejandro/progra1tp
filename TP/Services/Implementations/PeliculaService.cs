@@ -19,7 +19,7 @@ namespace Cine_TP.Services.Implementations
 
         public Task<bool> ActualizarEstadoPeliculaAsync(int id, string estado)
         {
-            if(id < 0 || !EstadoPelicula.Validos.Contains(estado))
+            if(id <= 0 || !EstadoPelicula.Validos.Contains(estado))
             {
                 return Task.FromResult(false);
             }
@@ -44,21 +44,17 @@ namespace Cine_TP.Services.Implementations
             return _peliculaRepository.CreateMovieAsync(pelicula);
         }
 
-        public Task<Pelicula?> ObtenerPeliculaPorIdAsync(int id)
+        public async Task<Pelicula?> ObtenerPeliculaPorIdAsync(int id)
         {
-            if(id < 0)
+            if(id <= 0)
             {
                 return null;
             }
-            return _peliculaRepository.GetMovieByIdAsync(id);
+            return await _peliculaRepository.GetMovieByIdAsync(id);
         }
 
-        public Task<List<Pelicula?>> ObtenerPeliculaPorNombreAsync(string nombrePelicula)
+        public Task<List<Pelicula>> ObtenerPeliculaPorNombreAsync(string nombrePelicula)
         {
-            if(string.IsNullOrWhiteSpace(nombrePelicula))
-            {
-                return _peliculaRepository.GetAllMoviesAsync();
-            }
             return _peliculaRepository.GetMovieByNameAsync(nombrePelicula);
         }
 
@@ -93,11 +89,11 @@ namespace Cine_TP.Services.Implementations
             {
                 return false;
             }
-            if (pelicula.IdGenero is null || pelicula.IdGenero < 0)
+            if (pelicula.IdGenero is null || pelicula.IdGenero <= 0)
             {
                 return false;
             }
-            if (pelicula.IdClasificacion is null || pelicula.IdClasificacion < 0)
+            if (pelicula.IdClasificacion is null || pelicula.IdClasificacion <= 0)
             {
                 return false;
             }
