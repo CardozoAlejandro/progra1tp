@@ -58,5 +58,22 @@ namespace Cine_TP.Data.Implementations
             return await _context.Usuarios
                                  .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario && u.PasswordHash == passwordHash);
         }
+
+        public async Task<bool> CreateUserAsync(Usuario usuario)
+        {
+            if(usuario == null)
+            {
+                return false;
+            }
+            try
+            {
+                await _context.Usuarios.AddAsync(usuario);
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
+        }
     }
 }

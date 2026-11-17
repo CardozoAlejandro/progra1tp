@@ -2,8 +2,10 @@
 using Cine_TP.Domain;
 using CineWebApi.DTOs;
 using Cine_TP.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 namespace Cine_TP.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ComprobantesController : ControllerBase

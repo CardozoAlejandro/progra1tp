@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Cine_TP.Domain
 {
@@ -43,6 +44,7 @@ namespace Cine_TP.Domain
         public bool ButacaOcupada { get; set; } = true;
 
         // Relación Detalle -> Maestro
+        [JsonIgnore]
         [ForeignKey(nameof(IdComprobante))]
         public virtual Comprobante? Comprobante { get; set; }
 
