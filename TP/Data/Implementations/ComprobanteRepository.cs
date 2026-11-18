@@ -31,7 +31,8 @@ namespace Cine_TP.Data.Implementations
         {
             return await _context.Comprobantes
                                  .Include(c => c.ComprobanteDetalles)
-                                 .FirstOrDefaultAsync(c => c.Id == id);
+                                 .Where(c => c.Id == id)
+                                 .FirstOrDefaultAsync();
         }
 
         public async Task<bool> CreateComprobanteAsync(Comprobante comprobante)
@@ -51,15 +52,36 @@ namespace Cine_TP.Data.Implementations
             var ahora = DateTime.Now;
             foreach (var d in detalles)
             {
+                d.Id = 0;
+                d.Comprobante = null;
+                d.Funcion = null;
+                d.Butaca = null;
+                d.TipoPublico = null;
+
+                var vencidos = await _context.ComprobanteDetalles
+                    .Where(x => x.IdFuncion == d.IdFuncion
+                             && x.IdButaca == d.IdButaca
+                             && x.ButacaOcupada
+                             && x.Comprobante!.Estado == EstadoComprobante.Pendiente
+                             && x.Comprobante.FechaLimiteConfirmacion < ahora)
+                    .ToListAsync();
+
+                foreach (var v in vencidos)
+                    v.ButacaOcupada = false;
+
+                if (vencidos.Count > 0)
+                    await _context.SaveChangesAsync();
+
                 bool ocupada = await _context.ComprobanteDetalles.AnyAsync(x =>
-                x.IdFuncion == d.IdFuncion &&
-                x.IdButaca == d.IdButaca &&
-                x.ButacaOcupada &&
-                x.Comprobante!.Estado != EstadoComprobante.Cancelado &&
-                !(x.Comprobante.Estado == EstadoComprobante.Pendiente &&
-                x.Comprobante.FechaLimiteConfirmacion < ahora));
+                    x.IdFuncion == d.IdFuncion &&
+                    x.IdButaca == d.IdButaca &&
+                    x.ButacaOcupada);
+
                 if (ocupada)
-                    throw new InvalidOperationException($"La butaca {d.IdButaca} ya está ocupada para la función {d.IdFuncion}.");
+                    throw new InvalidOperationException(
+                        $"La butaca {d.IdButaca} ya está ocupada para la función {d.IdFuncion}.");
+
+                d.ButacaOcupada = true;
             }
 
             comprobante.MontoTotal = detalles.Sum(d => d.PrecioBase);
@@ -69,7 +91,8 @@ namespace Cine_TP.Data.Implementations
             {
                 var promo = await _context.Promociones
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(p => p.Id == comprobante.IdPromocion);
+                    .Where(p => p.Id == comprobante.IdPromocion)
+                    .FirstOrDefaultAsync();
 
                 if (promo == null)
                     throw new InvalidOperationException("La promoción indicada no existe.");
@@ -95,6 +118,9 @@ namespace Cine_TP.Data.Implementations
                 return false;
 
             comprobante.Estado = nuevoEstado;
+            bool ocupada = nuevoEstado != EstadoComprobante.Cancelado;
+            foreach (var d in comprobante.ComprobanteDetalles)
+                d.ButacaOcupada = ocupada;
 
             await _context.SaveChangesAsync();
             return true;
@@ -104,7 +130,8 @@ namespace Cine_TP.Data.Implementations
         {
             var c = await _context.Comprobantes
                                   .Include(c => c.ComprobanteDetalles)
-                                  .FirstOrDefaultAsync(c => c.Id == id);
+                                  .Where(c => c.Id == id)
+                                  .FirstOrDefaultAsync();
             if (c == null)
                 return false;
 

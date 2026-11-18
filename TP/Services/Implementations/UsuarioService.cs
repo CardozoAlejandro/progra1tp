@@ -37,7 +37,7 @@ namespace Cine_TP.Services.Implementations
 
         public Task<Usuario?> ObtenerUsuarioPorId(int id)
         {
-            if(id < 0)
+            if(id <= 0)
             {
                 return null;
             }

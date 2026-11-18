@@ -61,10 +61,12 @@ builder.Services.AddDbContext<CineDbContext>(options =>
 builder.Services.AddScoped<IComprobanteRepository, ComprobanteRepository>();
 builder.Services.AddScoped<IPeliculaRepository, PeliculaRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 // Registrar Servicios
 builder.Services.AddScoped<IComprobanteService, ComprobanteService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPeliculaService, PeliculaService>();
+builder.Services.AddScoped<IClienteService, ClienteService>();
 
 builder.Services.AddAuthorization();
 // Agregar controladores y OpenAPI/Swagger

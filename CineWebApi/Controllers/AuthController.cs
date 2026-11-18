@@ -25,12 +25,17 @@ namespace CineWebApi.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistroDTO registro)
         {
-            var ok = await _authService.RegistrarAsync(registro.NombreUsuario, registro.Email, registro.Password, registro.Dni);
-            if (!ok)
+            try
             {
-                return BadRequest(new { mensaje = "El nombre de usuario ya existe." });
+                await _authService.RegistrarAsync(registro.NombreUsuario, registro.Email, registro.Password,
+                    registro.Nombre, registro.Apellido, registro.Dni, registro.FechaNacimiento, registro.Telefono);
+
+                return StatusCode(201, new { mensaje = "Usuario creado." });
             }
-            return StatusCode(201, new { mensaje = "Usuario creado." });
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
 
         [HttpPost("login")]

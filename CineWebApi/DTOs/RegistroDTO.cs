@@ -15,7 +15,22 @@ namespace CineWebApi.DTOs
         [Required, MinLength(6)]
         public string Password { get; set; } = string.Empty;
 
-        [Required, MinLength(8)]
+        [Required, StringLength(50)]
+        public string Nombre { get; set; } = string.Empty;
+
+        [Required, StringLength(50)]
+        public string Apellido { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(15, MinimumLength = 7)]
+        [RegularExpression(@"^\d+$", ErrorMessage = "El DNI solo puede contener números.")]
         public string Dni { get; set; } = string.Empty;
+
+        [Required]
+        [DataType(DataType.Date)]
+        public DateTime FechaNacimiento { get; set; }
+
+        [StringLength(20)]
+        public string? Telefono { get; set; }
     }
 }

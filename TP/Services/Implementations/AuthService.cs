@@ -17,19 +17,25 @@ namespace Cine_TP.Services.Implementations
     {
         private readonly IConfiguration _config;
         private readonly IUsuarioRepository _usuarioRepository;
-        public AuthService(IUsuarioRepository usuarioRepository, IConfiguration config)
+        private readonly IClienteRepository _clienteRepository;
+        public AuthService(IUsuarioRepository usuarioRepository, IClienteRepository clienteRepository, IConfiguration config)
         {
             _usuarioRepository = usuarioRepository;
+            _clienteRepository = clienteRepository;
             _config = config;
         }
-        public async Task<bool> RegistrarAsync(string nombreUsuario, string email, string password, string dni)
+        public async Task<bool> RegistrarAsync(string nombreUsuario, string email, string password, string nombre, string apellido, string dni, DateTime fechaNacimiento, string? telefono)
         {
             if (await _usuarioRepository.GetUserByNameAsync(nombreUsuario) != null)
                 throw new InvalidOperationException("El nombre de usuario ya existe.");
             if (await _usuarioRepository.GetUserByEmailAsync(email) != null)
                 throw new InvalidOperationException("La dirección de email ya está en uso.");
+            if (fechaNacimiento.Date > DateTime.Today)
+                throw new InvalidOperationException("La fecha de nacimiento no es válida.");
 
-                var usuario = new Usuario
+            dni = dni.Replace(".", "").Replace(" ", "").Trim();
+
+            var usuario = new Usuario
             {
                 NombreUsuario = nombreUsuario,
                 Email = email,
@@ -37,13 +43,27 @@ namespace Cine_TP.Services.Implementations
                 Rol = "Cliente"
             };
 
-            if (!string.IsNullOrWhiteSpace(dni))
+            var cliente = await _clienteRepository.GetByDniAsync(dni);
+
+            if (cliente == null)
             {
-                
-
-                
+                usuario.Cliente = new Cliente
+                {
+                    Dni = dni,
+                    Nombre = nombre,
+                    Apellido = apellido,
+                    Email = email,
+                    Telefono = telefono,
+                    FechaNacimiento = fechaNacimiento
+                };
             }
+            else
+            {
+                if (cliente.IdUsuario != null || cliente.FechaNacimiento.Date != fechaNacimiento.Date)
+                    throw new InvalidOperationException("No se pudo vincular el DNI con los datos indicados.");
 
+                usuario.Cliente = cliente;
+            }
             await _usuarioRepository.CreateUserAsync(usuario);
             return true;
         }
@@ -63,13 +83,17 @@ namespace Cine_TP.Services.Implementations
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
                 new Claim(ClaimTypes.Name, usuario.NombreUsuario),
                 new Claim(ClaimTypes.Role, usuario.Rol),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+
+            if (usuario.Cliente is not null)
+                claims.Add(new Claim("idCliente", usuario.Cliente.Id.ToString()));
 
             var token = new JwtSecurityToken(
                 issuer: "CineWebApi",

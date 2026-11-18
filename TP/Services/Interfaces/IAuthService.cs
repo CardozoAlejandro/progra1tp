@@ -8,7 +8,7 @@ namespace Cine_TP.Services.Interfaces
 {
     public interface IAuthService
     {
-        Task<bool> RegistrarAsync(string nombreUsuario, string email, string password, string dni);
+        Task<bool> RegistrarAsync(string nombreUsuario, string email, string password, string nombre, string apellido, string dni, DateTime fechaNacimiento, string? telefono);
         Task<string?> LoginAsync(string nombreUsuario, string password);
     }
 }
