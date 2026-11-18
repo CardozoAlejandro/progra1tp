@@ -21,8 +21,9 @@ namespace Cine_TP.Services.Implementations
         {
             if(string.IsNullOrWhiteSpace(dni))
             {
-                return null;
+                return Task.FromResult<Cliente?>(null);
             }
+            dni = dni.Replace(".", "").Replace(" ", "").Trim();
             return _clienteRepository.GetByDniAsync(dni);
         }
 
@@ -30,7 +31,7 @@ namespace Cine_TP.Services.Implementations
         {
             if(id <= 0)
             {
-                return null;
+                return Task.FromResult<Cliente?>(null);
             }
             return _clienteRepository.GetByIdAsync(id);
         }
