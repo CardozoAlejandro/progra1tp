@@ -97,6 +97,7 @@ namespace Cine_TP.Services.Implementations
             {
                 return false;
             }
+
             return true;
         }
     }

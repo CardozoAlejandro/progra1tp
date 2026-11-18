@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Cine_TP.Data;
-using ViajesRepository.Data.Implementations;
 using Cine_TP.Services.Interfaces;
 using Cine_TP.Services.Implementations;
 

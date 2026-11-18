@@ -24,16 +24,16 @@ namespace Cine_TP.Services.Implementations
 
         public Task<Comprobante?> ObtenerComprobantePorIdAsync(int id)
         {
-            if(id < 0)
+            if(id <= 0)
             {
-                return null;
+                return Task.FromResult<Comprobante?>(null);
             }
             return _comprobanteRepository.GetComprobanteByIdAsync(id);
         }
 
         public Task<bool> ActualizarEstadoAsync(int id, string nuevoEstado)
         {
-            if (id < 0)
+            if (id <= 0)
             {
                 return Task.FromResult(false);
             }
@@ -46,36 +46,30 @@ namespace Cine_TP.Services.Implementations
 
         public Task<bool> CrearComprobanteAsync(Comprobante comp)
         {
-            if(comp.IdCliente is null || comp.IdCliente < 0)
+            if (comp.IdCliente is null or <= 0)
             {
                 return Task.FromResult(false);
             }
-            if(comp.FechaHoraCreacion > DateTime.Now)
+            if (comp.IdFormaPago is null or <= 0)
+            { 
+            return Task.FromResult(false); 
+            }
+            if (!EstadoComprobante.Validos.Contains(comp.Estado))
             {
                 return Task.FromResult(false);
             }
-            if(comp.FechaLimiteConfirmacion <  DateTime.Now)
+            if (comp.ComprobanteDetalles == null || comp.ComprobanteDetalles.Count == 0)
             {
                 return Task.FromResult(false);
             }
-            if(comp.FechaHoraEmision > DateTime.Now)
-            {
-                return Task.FromResult(false);
-            }
-            if(!EstadoComprobante.Validos.Contains(comp.Estado))
-            {
-                return Task.FromResult(false);
-            }
-            if(comp.IdFormaPago is null || comp.IdFormaPago < 0)
-            {
-                return Task.FromResult(false);
-            }
+            comp.FechaHoraCreacion = DateTime.Now;
+            comp.FechaLimiteConfirmacion ??= DateTime.Now.AddMinutes(15);
             return _comprobanteRepository.CreateComprobanteAsync(comp);
         }
 
         public Task<bool> BorrarComprobanteAsync(int id)
         {
-            if(id < 0)
+            if(id <= 0)
             {
                 return Task.FromResult(false);
             }

@@ -25,7 +25,7 @@ namespace CineWebApi.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistroDTO registro)
         {
-            var ok = await _authService.RegistrarAsync(registro.NombreUsuario, registro.Email, registro.Password);
+            var ok = await _authService.RegistrarAsync(registro.NombreUsuario, registro.Email, registro.Password, registro.Dni);
             if (!ok)
             {
                 return BadRequest(new { mensaje = "El nombre de usuario ya existe." });

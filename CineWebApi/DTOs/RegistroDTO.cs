@@ -14,5 +14,8 @@ namespace CineWebApi.DTOs
 
         [Required, MinLength(6)]
         public string Password { get; set; } = string.Empty;
+
+        [Required, MinLength(8)]
+        public string Dni { get; set; } = string.Empty;
     }
 }

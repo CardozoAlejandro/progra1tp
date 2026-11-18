@@ -22,21 +22,27 @@ namespace Cine_TP.Services.Implementations
             _usuarioRepository = usuarioRepository;
             _config = config;
         }
-        public async Task<bool> RegistrarAsync(string nombreUsuario, string email, string password)
+        public async Task<bool> RegistrarAsync(string nombreUsuario, string email, string password, string dni)
         {
-            var existente = await _usuarioRepository.GetUserByNameAsync(nombreUsuario);
-            if (existente != null)
-            {
-                return false;
-            }
+            if (await _usuarioRepository.GetUserByNameAsync(nombreUsuario) != null)
+                throw new InvalidOperationException("El nombre de usuario ya existe.");
+            if (await _usuarioRepository.GetUserByEmailAsync(email) != null)
+                throw new InvalidOperationException("La dirección de email ya está en uso.");
 
-            var usuario = new Usuario
+                var usuario = new Usuario
             {
                 NombreUsuario = nombreUsuario,
                 Email = email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
                 Rol = "Cliente"
             };
+
+            if (!string.IsNullOrWhiteSpace(dni))
+            {
+                
+
+                
+            }
 
             await _usuarioRepository.CreateUserAsync(usuario);
             return true;

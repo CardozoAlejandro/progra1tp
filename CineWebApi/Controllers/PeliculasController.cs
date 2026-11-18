@@ -34,7 +34,7 @@ namespace CineWebApi.Controllers
             var pelicula = await _peliculaService.ObtenerPeliculaPorIdAsync(id);
             if (pelicula == null)
             {
-                return NotFound();
+                return NotFound(new { mensaje = $"No se encontró la película con ID {id}." });
             }
             return Ok(pelicula);
         }
@@ -57,7 +57,7 @@ namespace CineWebApi.Controllers
                 if (!resultado)
                     return BadRequest();
 
-                return Ok(resultado);
+                return Ok(new { mensaje = "Película creada con éxito." });
             }
             catch (Exception ex)
             {

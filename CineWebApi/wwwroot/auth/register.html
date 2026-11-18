@@ -115,52 +115,83 @@
         <div class="card-body register-card-body">
           <p class="register-box-msg">Register a new membership</p>
 
-          <form action="../index3.html" method="post">
-            <label class="visually-hidden" for="registerName">Full Name</label>
-            <div class="input-group mb-3">
-              <input id="registerName" type="text" class="form-control" placeholder="Full Name" />
-              <div class="input-group-text">
-                <span class="bi bi-person"></span>
+          <form action="../index.html" method="post">
+              <label class="visually-hidden" for="registerUser">Nombre de usuario</label>
+              <div class="input-group mb-3">
+                  <input id="registerUser" type="text" class="form-control" placeholder="Nombre de usuario" autocomplete="username" />
+                  <div class="input-group-text">
+                      <span class="bi bi-person"></span>
+                  </div>
               </div>
-            </div>
-            <label class="visually-hidden" for="registerEmail">Email</label>
-            <div class="input-group mb-3">
-              <input id="registerEmail" type="email" class="form-control" placeholder="Email" />
-              <div class="input-group-text">
-                <span class="bi bi-envelope"></span>
+              <label class="visually-hidden" for="registerEmail">Email</label>
+              <div class="input-group mb-3">
+                  <input id="registerEmail" type="email" class="form-control" placeholder="Email" />
+                  <div class="input-group-text">
+                      <span class="bi bi-envelope"></span>
+                  </div>
               </div>
-            </div>
-            <label class="visually-hidden" for="registerPassword">Password</label>
-            <div class="input-group mb-3">
-              <input
-                id="registerPassword"
-                type="password"
-                class="form-control"
-                placeholder="Password"
-              />
-              <div class="input-group-text">
-                <span class="bi bi-lock-fill"></span>
+              <label class="visually-hidden" for="registerPassword">Password</label>
+              <div class="input-group mb-3">
+                  <input id="registerPassword"
+                         type="password"
+                         class="form-control"
+                         placeholder="Password" />
+                  <div class="input-group-text">
+                      <span class="bi bi-lock-fill"></span>
+                  </div>
               </div>
-            </div>
-            <!--begin::Row-->
-            <div class="row">
-              <div class="col-8">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
-                  <label class="form-check-label" for="flexCheckDefault">
-                    I agree to the <a href="#">terms</a>
-                  </label>
-                </div>
+              <label class="visually-hidden" for="registerNombre">Nombre</label>
+              <div class="input-group mb-3">
+                  <input id="registerNombre" type="text" class="form-control" placeholder="Nombre" autocomplete="given-name" />
               </div>
-              <!-- /.col -->
-              <div class="col-4">
-                <div class="d-grid gap-2">
-                  <button type="submit" class="btn btn-primary">Register</button>
-                </div>
+
+              <label class="visually-hidden" for="registerApellido">Apellido</label>
+              <div class="input-group mb-3">
+                  <input id="registerApellido" type="text" class="form-control" placeholder="Apellido" autocomplete="family-name" />
               </div>
-              <!-- /.col -->
-            </div>
-            <!--end::Row-->
+
+              <label class="visually-hidden" for="registerDni">DNI</label>
+              <div class="input-group mb-3">
+                  <input id="registerDni" type="text" inputmode="numeric" class="form-control" placeholder="DNI (sin puntos)" />
+                  <div class="input-group-text">
+                      <span class="bi bi-person-vcard"></span>
+                  </div>
+              </div>
+
+              <label for="registerNacimiento" class="form-label small mb-1">Fecha de nacimiento</label>
+              <div class="input-group mb-3">
+                  <input id="registerNacimiento" type="date" class="form-control" />
+                  <div class="input-group-text">
+                      <span class="bi bi-calendar-event"></span>
+                  </div>
+              </div>
+
+              <label class="visually-hidden" for="registerTelefono">Teléfono (opcional)</label>
+              <div class="input-group mb-3">
+                  <input id="registerTelefono" type="tel" class="form-control" placeholder="Teléfono (opcional)" autocomplete="tel" />
+                  <div class="input-group-text">
+                      <span class="bi bi-telephone"></span>
+                  </div>
+              </div>
+              <!--begin::Row-->
+              <div class="row">
+                  <div class="col-8">
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
+                          <label class="form-check-label" for="flexCheckDefault">
+                              I agree to the <a href="#">terms</a>
+                          </label>
+                      </div>
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-4">
+                      <div class="d-grid gap-2">
+                          <button type="submit" class="btn btn-primary">Register</button>
+                      </div>
+                  </div>
+                  <!-- /.col -->
+              </div>
+              <!--end::Row-->
           </form>
 
           <p class="mb-0">
