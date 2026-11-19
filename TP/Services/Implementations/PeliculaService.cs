@@ -53,9 +53,9 @@ namespace Cine_TP.Services.Implementations
             return await _peliculaRepository.GetMovieByIdAsync(id);
         }
 
-        public Task<List<Pelicula>> ObtenerPeliculaPorNombreAsync(string nombrePelicula)
+        public Task<List<Pelicula>> ObtenerPeliculasActivasAsync(string? nombrePelicula = null)
         {
-            return _peliculaRepository.GetMovieByNameAsync(nombrePelicula);
+            return _peliculaRepository.GetAllActiveMoviesAsync(nombrePelicula);
         }
 
         public Task<List<Pelicula>> ObtenerPeliculasAsync()
@@ -73,7 +73,7 @@ namespace Cine_TP.Services.Implementations
             {
                 return false;
             }
-            if (pelicula.DuracionMinutos < 0)
+            if (pelicula.DuracionMinutos <= 0)
             {
                 return false;
             }
@@ -81,7 +81,7 @@ namespace Cine_TP.Services.Implementations
             {
                 return false;
             }
-            if (pelicula.FechaEstreno is null || pelicula.FechaEstreno > DateTime.Now)
+            if (pelicula.FechaEstreno is null)
             {
                 return false;
             }

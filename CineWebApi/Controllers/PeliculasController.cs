@@ -19,12 +19,30 @@ namespace CineWebApi.Controllers
             _peliculaService = peliculaService;
         }
 
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var peliculas = await _peliculaService.ObtenerPeliculasAsync();
             return Ok(peliculas);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("en-cartelera")]
+        public async Task<IActionResult> GetAllActive([FromQuery(Name = "titulo")] string? nombrePelicula)
+        {
+            var peliculas = await _peliculaService.ObtenerPeliculasActivasAsync(nombrePelicula);
+            var resultado = peliculas.Select(p => new PeliculaCarteleraDTO
+            {
+                Id = p.Id,
+                Titulo = p.Titulo,
+                DuracionMinutos = p.DuracionMinutos,
+                FechaEstreno = p.FechaEstreno,
+                Genero = p.Genero?.NombreGenero,
+                Clasificacion = p.Clasificacion?.Codigo
+            });
+
+            return Ok(resultado);
         }
 
         [AllowAnonymous]
@@ -36,14 +54,6 @@ namespace CineWebApi.Controllers
             {
                 return NotFound(new { mensaje = $"No se encontró la película con ID {id}." });
             }
-            return Ok(pelicula);
-        }
-
-        [AllowAnonymous]
-        [HttpGet("buscar")]
-        public async Task<IActionResult> GetByName([FromQuery] string nombre)
-        {
-            var pelicula = await _peliculaService.ObtenerPeliculaPorNombreAsync(nombre);
             return Ok(pelicula);
         }
 
