@@ -12,5 +12,7 @@ namespace Cine_TP.Services.Interfaces
         Task<List<Cliente>> ObtenerClientesAsync();
         Task<Cliente?> ObtenerClientePorIdAsync(int id);
         Task<Cliente?> ObtenerClientePorDniAsync(string dni);
+        Task<Cliente?> ActualizarPerfilAsync(int idCliente, string nombre, string apellido, string email, string? telefono);
+        Task<bool> CambiarPasswordAsync(int idCliente, int? idUsuario, string passwordActual, string passwordNueva);
     }
 }

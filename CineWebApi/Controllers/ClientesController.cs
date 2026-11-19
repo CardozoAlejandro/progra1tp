@@ -13,12 +13,22 @@ namespace CineWebApi.Controllers
     public class ClientesController : ControllerBase
     {
         private readonly IClienteService _clienteService;
+
         public ClientesController(IClienteService clienteService)
         {
             _clienteService = clienteService;
         }
+
         private int? IdClienteActual =>
             int.TryParse(User.FindFirstValue("idCliente"), out var id) ? id : null;
+
+        private int? IdUsuarioActual =>
+            int.TryParse(
+                User.FindFirstValue(ClaimTypes.NameIdentifier) ??
+                User.FindFirstValue("idUsuario") ??
+                User.FindFirstValue("sub"),
+                out var id) ? id : null;
+
         private static ClienteDTO ADto(Cliente c) => new()
         {
             Id = c.Id,
@@ -43,6 +53,75 @@ namespace CineWebApi.Controllers
                 return NotFound(new { mensaje = "No se encontró tu perfil de cliente." });
 
             return Ok(ADto(cliente));
+        }
+
+        [Authorize(Roles = "Cliente")]
+        [HttpPut("me")]
+        public async Task<IActionResult> ActualizarMio([FromBody] ActualizarPerfilClienteDTO dto)
+        {
+            if (IdClienteActual is null)
+                return Forbid();
+
+            if (string.IsNullOrWhiteSpace(dto.Nombre) ||
+                string.IsNullOrWhiteSpace(dto.Apellido) ||
+                string.IsNullOrWhiteSpace(dto.Email))
+            {
+                return BadRequest(new { mensaje = "Nombre, apellido y email son obligatorios." });
+            }
+
+            try
+            {
+                // Nota: El DNI, fecha de nacimiento y tipo de público NO se modifican acá.
+                var actualizado = await _clienteService.ActualizarPerfilAsync(
+                    IdClienteActual.Value,
+                    dto.Nombre.Trim(),
+                    dto.Apellido.Trim(),
+                    dto.Email.Trim(),
+                    string.IsNullOrWhiteSpace(dto.Telefono) ? null : dto.Telefono.Trim()
+                );
+
+                if (actualizado == null)
+                    return NotFound(new { mensaje = "No se encontró tu perfil de cliente." });
+
+                return Ok(ADto(actualizado));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+
+        [Authorize(Roles = "Cliente")]
+        [HttpPut("me/password")]
+        public async Task<IActionResult> CambiarPasswordMio([FromBody] CambiarPasswordDTO dto)
+        {
+            if (IdClienteActual is null)
+                return Forbid();
+
+            if (string.IsNullOrWhiteSpace(dto.PasswordActual) || string.IsNullOrWhiteSpace(dto.PasswordNueva))
+                return BadRequest(new { mensaje = "Debés ingresar la contraseña actual y la nueva contraseña." });
+
+            if (dto.PasswordNueva.Length < 6)
+                return BadRequest(new { mensaje = "La nueva contraseña debe tener al menos 6 caracteres." });
+
+            try
+            {
+                var ok = await _clienteService.CambiarPasswordAsync(
+                    IdClienteActual.Value,
+                    IdUsuarioActual,
+                    dto.PasswordActual,
+                    dto.PasswordNueva
+                );
+
+                if (!ok)
+                    return BadRequest(new { mensaje = "La contraseña actual es incorrecta o no se pudo actualizar." });
+
+                return Ok(new { mensaje = "Contraseña actualizada correctamente." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
 
         [Authorize(Roles = "Admin")]
@@ -75,4 +154,18 @@ namespace CineWebApi.Controllers
             return Ok(ADto(cliente));
         }
     }
-}
+
+    public class ActualizarPerfilClienteDTO
+    {
+        public string Nombre { get; set; } = string.Empty;
+        public string Apellido { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? Telefono { get; set; }
+    }
+
+    public class CambiarPasswordDTO
+    {
+        public string PasswordActual { get; set; } = string.Empty;
+        public string PasswordNueva { get; set; } = string.Empty;
+    }
+}   

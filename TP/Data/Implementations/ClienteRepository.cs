@@ -12,6 +12,7 @@ namespace Cine_TP.Data.Implementations
     public class ClienteRepository : IClienteRepository
     {
         private readonly CineDbContext _context;
+
         public ClienteRepository(CineDbContext context)
         {
             _context = context;
@@ -34,6 +35,12 @@ namespace Cine_TP.Data.Implementations
             return await _context.Clientes.Include(c => c.Usuario)
                                           .Where(c => c.Id == id)
                                           .FirstOrDefaultAsync();
+        }
+
+        public async Task UpdateAsync(Cliente cliente)
+        {
+            _context.Clientes.Update(cliente);
+            await _context.SaveChangesAsync();
         }
     }
 }
