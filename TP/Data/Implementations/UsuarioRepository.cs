@@ -39,6 +39,7 @@ namespace Cine_TP.Data.Implementations
         public async Task<Usuario?> GetUserByNameAsync(string usuario)
         {
             return await _context.Usuarios
+                                 .Include(u => u.Cliente)
                                  .Where(u => u.NombreUsuario == usuario)
                                  .FirstOrDefaultAsync();
         }
@@ -57,6 +58,23 @@ namespace Cine_TP.Data.Implementations
         {
             return await _context.Usuarios
                                  .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario && u.PasswordHash == passwordHash);
+        }
+
+        public async Task<bool> CreateUserAsync(Usuario usuario)
+        {
+            if(usuario == null)
+            {
+                return false;
+            }
+            try
+            {
+                await _context.Usuarios.AddAsync(usuario);
+                return await _context.SaveChangesAsync() > 0;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
         }
     }
 }

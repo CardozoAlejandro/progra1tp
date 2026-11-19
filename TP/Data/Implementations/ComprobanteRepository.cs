@@ -1,14 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Cine_TP.Data;
+using Cine_TP.Data.Interfaces;
+using Cine_TP.Domain;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Cine_TP.Data.Interfaces;
-using Cine_TP.Domain;
-using Cine_TP.Data;
 
-namespace ViajesRepository.Data.Implementations
+namespace Cine_TP.Data.Implementations
 {
     public class ComprobanteRepository : IComprobanteRepository
     {
@@ -30,21 +31,84 @@ namespace ViajesRepository.Data.Implementations
         {
             return await _context.Comprobantes
                                  .Include(c => c.ComprobanteDetalles)
-                                 .FirstOrDefaultAsync(c => c.Id == id);
+                                 .Where(c => c.Id == id)
+                                 .FirstOrDefaultAsync();
         }
 
         public async Task<bool> CreateComprobanteAsync(Comprobante comprobante)
         {
-            // Calculamos subtotales y total iterando los detalles
-            decimal totalViaje = 0;
+            var detalles = comprobante.ComprobanteDetalles;
+            bool repetidas = detalles
+                             .GroupBy(d => new { d.IdFuncion, d.IdButaca })
+                             .Any(g => g.Count() > 1);
+            if (repetidas)
+                throw new InvalidOperationException("Hay butacas repetidas en el comprobante.");
+            await using var tx = await _context.Database.BeginTransactionAsync();
 
-            comprobante.MontoTotal = totalViaje;
+            comprobante.Id = 0;
+            comprobante.Cliente = null;
+            comprobante.FormaPago = null;
+            comprobante.Promocion = null;
+            var ahora = DateTime.Now;
+            foreach (var d in detalles)
+            {
+                d.Id = 0;
+                d.Comprobante = null;
+                d.Funcion = null;
+                d.Butaca = null;
+                d.TipoPublico = null;
 
-            // agregamos el Viaje y se mapean automáticamente sus ViajeDetalles
+                var vencidos = await _context.ComprobanteDetalles
+                    .Where(x => x.IdFuncion == d.IdFuncion
+                             && x.IdButaca == d.IdButaca
+                             && x.ButacaOcupada
+                             && x.Comprobante!.Estado == EstadoComprobante.Pendiente
+                             && x.Comprobante.FechaLimiteConfirmacion < ahora)
+                    .ToListAsync();
+
+                foreach (var v in vencidos)
+                    v.ButacaOcupada = false;
+
+                if (vencidos.Count > 0)
+                    await _context.SaveChangesAsync();
+
+                bool ocupada = await _context.ComprobanteDetalles.AnyAsync(x =>
+                    x.IdFuncion == d.IdFuncion &&
+                    x.IdButaca == d.IdButaca &&
+                    x.ButacaOcupada);
+
+                if (ocupada)
+                    throw new InvalidOperationException(
+                        $"La butaca {d.IdButaca} ya está ocupada para la función {d.IdFuncion}.");
+
+                d.ButacaOcupada = true;
+            }
+
+            comprobante.MontoTotal = detalles.Sum(d => d.PrecioBase);
+
+            decimal descuento = 0;
+            if (comprobante.IdPromocion is not null)
+            {
+                var promo = await _context.Promociones
+                    .AsNoTracking()
+                    .Where(p => p.Id == comprobante.IdPromocion)
+                    .FirstOrDefaultAsync();
+
+                if (promo == null)
+                    throw new InvalidOperationException("La promoción indicada no existe.");
+
+                ValidarPromocion(promo, ahora);
+
+                descuento = Math.Round(comprobante.MontoTotal * promo.PorcentajeDescuento / 100m, 2);
+            }
+
+            comprobante.MontoFinal = comprobante.MontoTotal - descuento;
+
             await _context.Comprobantes.AddAsync(comprobante);
+            bool ok = await _context.SaveChangesAsync() > 0;
 
-            // SaveChangesAsync ejecuta TODO en una sola transacción
-            return await _context.SaveChangesAsync() > 0;
+            await tx.CommitAsync();
+            return ok;
         }
 
         public async Task<bool> UpdateEstadoAsync(int id, string nuevoEstado)
@@ -54,18 +118,48 @@ namespace ViajesRepository.Data.Implementations
                 return false;
 
             comprobante.Estado = nuevoEstado;
+            bool ocupada = nuevoEstado != EstadoComprobante.Cancelado;
+            foreach (var d in comprobante.ComprobanteDetalles)
+                d.ButacaOcupada = ocupada;
 
-            return await _context.SaveChangesAsync() > 0;
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<bool> DeleteComprobanteAsync(int id)
         {
-            var c = await _context.Comprobantes.FindAsync(id);
+            var c = await _context.Comprobantes
+                                  .Include(c => c.ComprobanteDetalles)
+                                  .Where(c => c.Id == id)
+                                  .FirstOrDefaultAsync();
             if (c == null)
                 return false;
 
+            _context.ComprobanteDetalles.RemoveRange(c.ComprobanteDetalles);
             _context.Comprobantes.Remove(c);
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        private static void ValidarPromocion(Promocion promo, DateTime referencia)
+        {
+            var cultura = new CultureInfo("es-AR");
+
+            if (!string.IsNullOrWhiteSpace(promo.DiaSemana))
+            {
+                string dia = referencia.ToString("dddd", cultura);
+                if (string.Compare(dia, promo.DiaSemana.Trim(), cultura,
+                        CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) != 0)
+                    throw new InvalidOperationException(
+                        $"La promoción '{promo.NombrePromo}' solo es válida los {promo.DiaSemana}.");
+            }
+
+            if (promo.HoraInicio is not null && promo.HoraFin is not null)
+            {
+                var hora = referencia.TimeOfDay;
+                if (hora < promo.HoraInicio || hora > promo.HoraFin)
+                    throw new InvalidOperationException(
+                        $"La promoción '{promo.NombrePromo}' solo es válida de {promo.HoraInicio:hh\\:mm} a {promo.HoraFin:hh\\:mm}.");
+            }
         }
     }
 }

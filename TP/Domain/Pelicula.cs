@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Cine_TP.Domain
 {
@@ -46,6 +47,7 @@ namespace Cine_TP.Domain
         [ForeignKey(nameof(IdClasificacion))]
         public virtual Clasificacion? Clasificacion { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<Funcion> Funciones { get; set; } = new List<Funcion>();
     }
 }

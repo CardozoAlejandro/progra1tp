@@ -11,7 +11,7 @@ namespace Cine_TP.Services.Interfaces
     {
         Task<List<Pelicula>> ObtenerPeliculasAsync();
         Task<Pelicula?> ObtenerPeliculaPorIdAsync(int id);
-        Task<List<Pelicula?>> ObtenerPeliculaPorNombreAsync(string nombrePelicula);
+        Task<List<Pelicula>> ObtenerPeliculaPorNombreAsync(string nombrePelicula);
         Task<bool> CrearPeliculaAsync(Pelicula pelicula);
         Task<bool> ActualizarEstadoPeliculaAsync(int id, string estado);
         Task<bool> ActualizarPeliculaAsync(int id, Pelicula pelicula);
