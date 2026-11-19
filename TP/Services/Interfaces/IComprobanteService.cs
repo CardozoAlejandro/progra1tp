@@ -17,6 +17,7 @@ namespace Cine_TP.Services.Interfaces
         Task<bool> BorrarComprobanteAsync(int id);
         Task<List<(string pelicula, decimal total)>> ObtenerIngresosPorPeliculaAsync();
         Task<List<(int anio, int mes, decimal total)>> ObtenerIngresosMensualesAsync();
-        Task<ResultadoCompra> ReservarEntradasAsync(int idFuncion, int cantidad, int? idUsuario, string? nombreUsuario);
+        Task<bool> ExisteFormaPagoAsync(int id);
+        Task<ResultadoCompra> ReservarEntradasAsync(int idFuncion, int cantidad, int idFormaPago, int? idUsuario, string? nombreUsuario);
     }
 }

@@ -41,7 +41,7 @@ namespace Cine_TP.Controllers
             int? idUsuario = int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id)
                 ? id : (int?)null;
 
-            var r = await _comprobanteService.ReservarEntradasAsync(dto.IdFuncion, dto.Cantidad, idUsuario, User.Identity?.Name);
+            var r = await _comprobanteService.ReservarEntradasAsync(dto.IdFuncion, dto.Cantidad, dto.IdFormaPago, idUsuario, User.Identity?.Name);
             if (r.Comprobante == null)
                 return StatusCode(r.Status, new { mensaje = r.Mensaje });
 

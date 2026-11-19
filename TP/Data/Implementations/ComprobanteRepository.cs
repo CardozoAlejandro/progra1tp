@@ -212,5 +212,10 @@ namespace Cine_TP.Data.Implementations
                 .Select(c => (int?)c.Id)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<bool> FormaPagoExistsAsync(int id)
+        {
+            return await _context.FormasPago.AsNoTracking().AnyAsync(f => f.Id == id);
+        }
     }
 }

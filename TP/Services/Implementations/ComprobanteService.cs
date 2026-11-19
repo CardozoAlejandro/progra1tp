@@ -88,6 +88,15 @@ namespace Cine_TP.Services.Implementations
             return _comprobanteRepository.GetIngresosAsync();
         }
 
+        public Task<bool> ExisteFormaPagoAsync(int id)
+        {
+            if (id <= 0)
+            {
+                return Task.FromResult(false);
+            }
+            return _comprobanteRepository.FormaPagoExistsAsync(id);
+        }
+
         public async Task<List<(int anio, int mes, decimal total)>> ObtenerIngresosMensualesAsync()
         {
             var porMes = await _comprobanteRepository.GetIngresosMensualesAsync();
@@ -106,7 +115,7 @@ namespace Cine_TP.Services.Implementations
             return resultado;
         }
 
-        public async Task<ResultadoCompra> ReservarEntradasAsync(int idFuncion, int cantidad, int? idUsuario, string? nombreUsuario)
+        public async Task<ResultadoCompra> ReservarEntradasAsync(int idFuncion, int cantidad, int idFormaPago, int? idUsuario, string? nombreUsuario)
         {
             if (cantidad <= 0)
                 return new(null, 400, "La cantidad debe ser mayor a cero.");
@@ -125,11 +134,15 @@ namespace Cine_TP.Services.Implementations
             if (butacas.Count < cantidad)
                 return new(null, 409, "No hay suficientes entradas disponibles.");
 
+            if (idFormaPago <= 0 || !await _comprobanteRepository.FormaPagoExistsAsync(idFormaPago))
+                return new(null, 400, "Seleccioná una forma de pago válida.");
+
             var comprobante = new Comprobante
             {
                 IdCliente = idCliente,
-                Estado = EstadoComprobante.Pendiente,
-                FechaLimiteConfirmacion = DateTime.Now.AddMinutes(10),
+                IdFormaPago = idFormaPago,
+                Estado = EstadoComprobante.Confirmada,
+                FechaHoraEmision = DateTime.Now,
                 ComprobanteDetalles = butacas.Select(b => new ComprobanteDetalle
                 {
                     IdFuncion = funcion.Id,

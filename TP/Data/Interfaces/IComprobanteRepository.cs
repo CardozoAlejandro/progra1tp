@@ -17,5 +17,6 @@ namespace Cine_TP.Data.Interfaces
         Task<List<(string pelicula, decimal total)>> GetIngresosAsync();
         Task<List<(int anio, int mes, decimal total)>> GetIngresosMensualesAsync();
         Task<int?> GetIdClienteAsync(int? idUsuario, string? nombreUsuario);
+        Task<bool> FormaPagoExistsAsync(int id);
     }
 }
