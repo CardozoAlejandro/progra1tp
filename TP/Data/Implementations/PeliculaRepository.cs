@@ -22,6 +22,19 @@ namespace Cine_TP.Data.Implementations
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<List<Pelicula>> GetAllActiveMoviesAsync(string? nombrePelicula = null)
+        {
+            var consulta = _context.Peliculas.AsNoTracking()
+                                             .Include(p => p.Genero)
+                                             .Include(p => p.Clasificacion)
+                                             .Where(p => p.Estado == EstadoPelicula.EnCartelera);
+
+            if (!string.IsNullOrWhiteSpace(nombrePelicula))
+                consulta = consulta.Where(p => p.Titulo.Contains(nombrePelicula.Trim()));
+
+            return await consulta.OrderBy(p => p.Titulo).ToListAsync();
+        }
+
         public async Task<List<Pelicula>> GetAllMoviesAsync()
         {
             return await _context.Peliculas
@@ -38,19 +51,6 @@ namespace Cine_TP.Data.Implementations
                 .Include(p => p.Clasificacion)
                 .FirstOrDefaultAsync();
         }
-
-        public async Task<List<Pelicula>> GetMovieByNameAsync(string nombrePelicula)
-        {
-            if (string.IsNullOrWhiteSpace(nombrePelicula))
-            {
-                return new List<Pelicula>();
-            }
-            return await _context.Peliculas
-                .Where(p => p.Titulo.Contains(nombrePelicula))
-                .Include(p => p.Genero)
-                .Include(p => p.Clasificacion)
-                .ToListAsync();
-        }   
 
         public async Task<bool> UpdateMovieAsync(int id, Pelicula pelicula)
         {
