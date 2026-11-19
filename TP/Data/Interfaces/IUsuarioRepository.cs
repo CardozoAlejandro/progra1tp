@@ -16,5 +16,6 @@ namespace Cine_TP.Data.Interfaces
         Task<bool> UserExistsAsync(string usuario);
         Task<bool> EmailExistsAsync(string email);
         Task<Usuario?> ValidateUserAsync(string nombreUsuario, string passwordHash);
+        Task<bool> CreateUserAsync(Usuario usuario);
     }
 }

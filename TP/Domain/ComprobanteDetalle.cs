@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Cine_TP.Domain
 {
@@ -31,18 +32,11 @@ namespace Cine_TP.Domain
         public decimal PrecioBase { get; set; }
 
         [Required]
-        [Column("descuento_unitario", TypeName = "decimal(10,2)")]
-        public decimal DescuentoUnitario { get; set; }
-
-        [Required]
-        [Column("precio_unitario", TypeName = "decimal(10,2)")]
-        public decimal PrecioUnitario { get; set; }
-
-        [Required]
         [Column("butaca_ocupada")]
         public bool ButacaOcupada { get; set; } = true;
 
         // Relación Detalle -> Maestro
+        [JsonIgnore]
         [ForeignKey(nameof(IdComprobante))]
         public virtual Comprobante? Comprobante { get; set; }
 

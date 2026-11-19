@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Cine_TP.Domain
 {
@@ -40,6 +41,7 @@ namespace Cine_TP.Domain
         [ForeignKey(nameof(IdSala))]
         public virtual Sala? Sala { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<ComprobanteDetalle> ComprobanteDetalles { get; set; } = new List<ComprobanteDetalle>();
     }
 }

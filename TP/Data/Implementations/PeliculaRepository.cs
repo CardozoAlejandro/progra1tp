@@ -16,9 +16,10 @@ namespace Cine_TP.Data.Implementations
         {
             _context = context;
         }
-        public Task<bool> CreateMovieAsync(Pelicula pelicula)
+        public async Task<bool> CreateMovieAsync(Pelicula pelicula)
         {
-            throw new NotImplementedException();
+            await _context.Peliculas.AddAsync(pelicula);
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task<List<Pelicula>> GetAllMoviesAsync()
@@ -38,14 +39,18 @@ namespace Cine_TP.Data.Implementations
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<List<Pelicula?>> GetMovieByNameAsync(string nombrePelicula)
+        public async Task<List<Pelicula>> GetMovieByNameAsync(string nombrePelicula)
         {
+            if (string.IsNullOrWhiteSpace(nombrePelicula))
+            {
+                return new List<Pelicula>();
+            }
             return await _context.Peliculas
-                .Where(p => p.Titulo == nombrePelicula)
+                .Where(p => p.Titulo.Contains(nombrePelicula))
                 .Include(p => p.Genero)
                 .Include(p => p.Clasificacion)
                 .ToListAsync();
-        }
+        }   
 
         public async Task<bool> UpdateMovieAsync(int id, Pelicula pelicula)
         {

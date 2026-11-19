@@ -39,10 +39,6 @@ namespace Cine_TP.Domain
         public decimal MontoTotal { get; set; }
 
         [Required]
-        [Column("descuento", TypeName = "decimal(10,2)")]
-        public decimal Descuento { get; set; }
-
-        [Required]
         [Column("monto_final", TypeName = "decimal(10,2)")]
         public decimal MontoFinal { get; set; }
 
