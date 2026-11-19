@@ -176,16 +176,36 @@
                         <!--begin::Panel de administrador (solo Admin)-->
                         <li class="nav-header d-none" data-solo-admin>PANEL DE ADMINISTRADOR</li>
                         <li class="nav-item d-none" data-solo-admin>
-                            <a href="./listausuarios.html" class="nav-link active">
+                            <a href="./listausuarios.html" class="nav-link">
                                 <i class="nav-icon bi bi-people"></i>
                                 <p>Lista de usuarios</p>
                             </a>
                         </li>
                         <li class="nav-item d-none" data-solo-admin>
-                            <a href="./listapeliculas.html" class="nav-link">
+                            <!-- Botón desplegable -->
+                            <a href="#" class="nav-link" role="button" aria-expanded="true">
                                 <i class="nav-icon bi bi-film"></i>
-                                <p>Lista de películas</p>
+                                <p>
+                                    Películas
+                                    <i class="nav-arrow bi bi-chevron-right"></i>
+                                </p>
                             </a>
+                            <!-- Subopciones -->
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="./listapeliculas.html" class="nav-link">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Lista de películas</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="./estadisticas.html" class="nav-link active"
+                                       aria-current="page">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Estadísticas</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <!--end::Panel de administrador-->
                     </ul>
@@ -252,7 +272,7 @@
                 </a>
             </div>
             <strong>
-                Copyright &copy; 2014-2026&nbsp;
+                Copyright &copy; 2026-2026&nbsp;
                 <a href="https://uvs.frc.utn.edu.ar/" class="text-decoration-none">TUP</a>.
             </strong>
         </footer>

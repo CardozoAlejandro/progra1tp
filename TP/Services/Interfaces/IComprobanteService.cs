@@ -14,5 +14,7 @@ namespace Cine_TP.Services.Interfaces
         Task<bool> CrearComprobanteAsync(Comprobante comprobante);
         Task<bool> ActualizarEstadoAsync(int id, string nuevoEstado);
         Task<bool> BorrarComprobanteAsync(int id);
+        Task<List<(string pelicula, decimal total)>> ObtenerIngresosPorPeliculaAsync();
+        Task<List<(int anio, int mes, decimal total)>> ObtenerIngresosMensualesAsync();
     }
 }

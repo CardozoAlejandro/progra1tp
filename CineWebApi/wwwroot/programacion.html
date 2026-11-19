@@ -67,6 +67,12 @@
                             <i class="bi bi-list"></i>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="nav-icon bi bi-film"></i>
+                            <span class="d-none d-sm-inline">Cartelera</span>
+                        </a>
+                    </li>
                 </ul>
 
                 <ul class="navbar-nav ms-auto">
@@ -179,10 +185,30 @@
                             </a>
                         </li>
                         <li class="nav-item d-none" data-solo-admin>
-                            <a href="./listapeliculas.html" class="nav-link">
+                            <!-- Botón desplegable -->
+                            <a href="#" class="nav-link" role="button" aria-expanded="true">
                                 <i class="nav-icon bi bi-film"></i>
-                                <p>Lista de películas</p>
+                                <p>
+                                    Películas
+                                    <i class="nav-arrow bi bi-chevron-right"></i>
+                                </p>
                             </a>
+                            <!-- Subopciones -->
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="./listapeliculas.html" class="nav-link">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Lista de películas</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="./estadisticas.html" class="nav-link active"
+                                       aria-current="page">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Estadísticas</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <!--end::Panel de administrador-->
                         <!-- Más opciones acá, copiando un <li class="nav-item"> -->
@@ -245,7 +271,7 @@
             </div>
             <!--end::To the end-->
             <strong>
-                Copyright &copy; 2014-2026&nbsp;
+                Copyright &copy; 2026-2026&nbsp;
                 <a href="https://uvs.frc.utn.edu.ar/" class="text-decoration-none">TUP</a>.
             </strong>
         </footer>

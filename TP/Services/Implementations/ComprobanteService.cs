@@ -75,5 +75,25 @@ namespace Cine_TP.Services.Implementations
             }
             return _comprobanteRepository.DeleteComprobanteAsync(id);
         }
+        public Task<List<(string pelicula, decimal total)>> ObtenerIngresosPorPeliculaAsync()
+                        => _comprobanteRepository.GetIngresosAsync();
+
+        public async Task<List<(int anio, int mes, decimal total)>> ObtenerIngresosMensualesAsync()
+        {
+            var porMes = await _comprobanteRepository.GetIngresosMensualesAsync();
+            if (porMes.Count == 0)
+                return new List<(int, int, decimal)>();
+
+            var desde = new DateTime(porMes[0].anio, porMes[0].mes, 1);
+            var hasta = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+
+            var resultado = new List<(int Anio, int Mes, decimal Total)>();
+            for (var m = desde; m <= hasta; m = m.AddMonths(1))
+            {
+                var fila = porMes.FirstOrDefault(x => x.anio == m.Year && x.mes == m.Month);
+                resultado.Add((m.Year, m.Month, fila.total));
+            }
+            return resultado;
+        }
     }
 }

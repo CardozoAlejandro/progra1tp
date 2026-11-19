@@ -74,5 +74,28 @@ namespace Cine_TP.Controllers
 
             return Ok();
         }
+
+        [HttpGet("ingresos-por-pelicula")]
+        public async Task<IActionResult> IngresosPorPelicula()
+        {
+            var datos = await _comprobanteService.ObtenerIngresosPorPeliculaAsync();
+            return Ok(datos.Select(x => new IngresoPeliculaDTO
+            {
+                Pelicula = x.pelicula,
+                Total = x.total
+            }));
+        }
+
+        [HttpGet("ingresos-mensuales")]
+        public async Task<IActionResult> IngresosMensuales()
+        {
+            var datos = await _comprobanteService.ObtenerIngresosMensualesAsync();
+            return Ok(datos.Select(x => new IngresoMensualDTO
+            {
+                Anio = x.anio,
+                Mes = x.mes,
+                Total = x.total
+            }));
+        }
     }
 }

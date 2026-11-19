@@ -36,12 +36,12 @@ namespace CineWebApi.Controllers
         }
 
         [HttpPut("{id}/estado")]
-        public async Task<IActionResult> UpdateEstado(int id, bool estado)
+        public async Task<IActionResult> UpdateEstado(int id, [FromBody] UpdateEstadoDTO estado)
         {
             if (id == IdUsuarioActual)
                 return BadRequest(new { mensaje = "No podés cambiar el estado de tu propio usuario." });
 
-            var actualizado = await _usuarioService.ActualizarEstadoUsuarioAsync(id, estado);
+            var actualizado = await _usuarioService.ActualizarEstadoUsuarioAsync(id, estado.Activo);
             if (!actualizado)
                 return NotFound(new { mensaje = $"No se encontró el usuario con ID {id}." });
 

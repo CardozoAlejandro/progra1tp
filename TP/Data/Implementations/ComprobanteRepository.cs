@@ -161,5 +161,43 @@ namespace Cine_TP.Data.Implementations
                         $"La promoción '{promo.NombrePromo}' solo es válida de {promo.HoraInicio:hh\\:mm} a {promo.HoraFin:hh\\:mm}.");
             }
         }
+
+        public async Task<List<(string pelicula, decimal total)>> GetIngresosAsync()
+        {
+            var datos = await _context.ComprobanteDetalles
+            .AsNoTracking()
+            .Where(d => d.Comprobante!.Estado == EstadoComprobante.Confirmado
+                 && d.Comprobante.MontoTotal > 0)
+            .GroupBy(d => new { d.Funcion!.IdPelicula, d.Funcion.Pelicula!.Titulo })
+            .Select(g => new
+            {
+                Pelicula = g.Key.Titulo,
+                Total = g.Sum(d => d.PrecioBase * d.Comprobante!.MontoFinal / d.Comprobante.MontoTotal)
+            })
+            .OrderByDescending(x => x.Total)
+            .Take(10)
+            .ToListAsync();
+
+            return datos.Select(x => (x.Pelicula, x.Total)).ToList();
+        }
+        
+        public async Task<List<(int anio, int mes, decimal total)>> GetIngresosMensualesAsync()
+        {
+            var datos = await _context.Comprobantes
+            .AsNoTracking()
+            .Where(c => c.Estado == EstadoComprobante.Confirmado)
+            .Select(c => new { Fecha = c.FechaHoraEmision ?? c.FechaHoraCreacion, c.MontoFinal })
+            .GroupBy(x => new { x.Fecha.Year, x.Fecha.Month })
+            .Select(g => new
+            {
+                g.Key.Year,
+                g.Key.Month,
+                Total = g.Sum(x => x.MontoFinal)
+            })
+            .OrderBy(x => x.Year).ThenBy(x => x.Month)
+            .ToListAsync();
+
+            return datos.Select(x => (x.Year, x.Month, x.Total)).ToList();
+        }
     }
 }
