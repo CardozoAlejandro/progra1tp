@@ -12,5 +12,6 @@ namespace Cine_TP.Data.Interfaces
         Task<List<Cliente>> GetAllAsync();
         Task<Cliente?> GetByIdAsync(int id);
         Task<Cliente?> GetByDniAsync(string dni);
+        Task UpdateAsync(Cliente cliente);
     }
 }

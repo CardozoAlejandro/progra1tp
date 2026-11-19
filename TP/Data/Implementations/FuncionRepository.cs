@@ -16,6 +16,22 @@ namespace Cine_TP.Data.Implementations
         {
             _context = context;
         }
+
+        public async Task<Funcion?> GetFuncionByIdAsync(int id)
+        {
+            return await _context.Funciones
+            .AsNoTracking()
+            .Include(f => f.Pelicula).ThenInclude(p => p!.Genero)
+            .Include(f => f.Pelicula).ThenInclude(p => p!.Clasificacion)
+            .FirstOrDefaultAsync(f => f.Id == id);
+        }
+        public async Task<int> CountEntradasVendidasAsync(int idFuncion)
+        {
+            return await _context.ComprobanteDetalles
+                            .AsNoTracking()
+                            .CountAsync(d => d.Funcion!.Id == idFuncion
+                             && d.Comprobante!.Estado == EstadoComprobante.Confirmada);
+        }
         public async Task<List<Funcion>> GetFuncionesAsync(DateTime desde, DateTime hasta)
         {
             return await _context.Funciones

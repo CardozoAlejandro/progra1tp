@@ -30,5 +30,23 @@ namespace Cine_TP.Services.Implementations
             }
             return _funcionRepository.GetFuncionesPeliculasAsync(idPelicula, desde);
         }
+
+        public Task<Funcion?> ObtenerFuncionPorIdAsync(int id)
+        {
+            if (id <= 0)
+            {
+                return null;
+            }
+            return _funcionRepository.GetFuncionByIdAsync(id);
+        }
+
+        public Task<int> ContarEntradasVendidasAsync(int idFuncion)
+        {
+            if (idFuncion <= 0)
+            {
+                return null;
+            }
+            return _funcionRepository.CountEntradasVendidasAsync(idFuncion);
+        }
     }
 }

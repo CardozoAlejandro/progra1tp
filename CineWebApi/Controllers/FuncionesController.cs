@@ -10,10 +10,36 @@ namespace CineWebApi.Controllers
     [ApiController]
     public class FuncionesController : ControllerBase
     {
+        private const int CapacidadSala = 50;
         private readonly IFuncionService _funcionService;
         public FuncionesController(IFuncionService funcionService)
         {
             _funcionService = funcionService;
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var f = await _funcionService.ObtenerFuncionPorIdAsync(id);
+            if (f == null)
+                return NotFound(new { mensaje = $"No se encontró la función con ID {id}." });
+
+            var vendidas = await _funcionService.ContarEntradasVendidasAsync(id);
+
+            return Ok(new FuncionDetalleDTO
+            {
+                IdFuncion = f.Id,
+                IdPelicula = f.IdPelicula,
+                Titulo = f.Pelicula!.Titulo,
+                DuracionMinutos = f.Pelicula.DuracionMinutos,
+                Genero = f.Pelicula.Genero?.NombreGenero,
+                Clasificacion = f.Pelicula.Clasificacion?.Codigo,
+                IdSala = f.IdSala,
+                FechaHoraInicio = f.FechaHoraInicio,
+                PrecioBase = f.PrecioBase,
+                Capacidad = CapacidadSala,
+                Disponibles = Math.Max(0, CapacidadSala - vendidas)
+            });
         }
 
         [HttpGet("horarios")]

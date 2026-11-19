@@ -35,5 +35,11 @@ namespace Cine_TP.Data.Implementations
                                           .Where(c => c.Id == id)
                                           .FirstOrDefaultAsync();
         }
+
+        public async Task UpdateAsync(Cliente cliente)
+        {
+            _context.Clientes.Update(cliente);
+            await _context.SaveChangesAsync();
+        }
     }
 }

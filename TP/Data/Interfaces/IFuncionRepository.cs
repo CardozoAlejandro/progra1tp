@@ -11,6 +11,8 @@ namespace Cine_TP.Data.Interfaces
     public interface IFuncionRepository
     {
         Task<List<Funcion>> GetFuncionesAsync(DateTime desde, DateTime hasta);
+        Task<Funcion?> GetFuncionByIdAsync(int id);
+        Task<int> CountEntradasVendidasAsync(int idFuncion);
         Task<List<Funcion>> GetFuncionesPeliculasAsync(int idPelicula, DateTime desde);
 
     }

@@ -11,6 +11,8 @@ namespace Cine_TP.Services.Interfaces
     public interface IFuncionService
     {
         Task<List<Funcion>> ObtenerFuncionesAsync(DateTime desde, DateTime hasta);
+        Task<Funcion?> ObtenerFuncionPorIdAsync(int id);
+        Task<int> ContarEntradasVendidasAsync(int idFuncion);
         Task<List<Funcion>> ObtenerFuncionesPorPeliculaAsync(int idPelicula, DateTime desde);
     }
 }

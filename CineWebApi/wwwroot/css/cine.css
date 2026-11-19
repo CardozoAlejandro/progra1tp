@@ -141,7 +141,57 @@
     text-decoration: none;
 }
 
-    .pelicula-titulo a:hover,
-    .pelicula-titulo a:focus-visible {
-        text-decoration: underline;
-    }
+.pelicula-titulo a:hover,
+.pelicula-titulo a:focus-visible {
+    text-decoration: underline;
+}
+
+.compra-poster {
+    flex: 0 0 150px;
+    max-width: 150px;
+}
+
+.compra-chip {
+    background-color: #0b7fa6;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.35rem;
+}
+
+.compra-total {
+    background-color: #0b7fa6;
+    color: #fff;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.compra-total .monto {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.compra-temporizador {
+    min-width: 6rem;
+    padding: 0.4rem 1.25rem;
+    border-radius: 0.25rem;
+    background-color: #c62828;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.btn-compra {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #2a8b8b;
+    --bs-btn-border-color: #2a8b8b;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #237373;
+    --bs-btn-hover-border-color: #237373;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #2a8b8b;
+    --bs-btn-disabled-border-color: #2a8b8b;
+}

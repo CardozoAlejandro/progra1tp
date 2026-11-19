@@ -65,6 +65,14 @@
         return [].concat(roles).includes(rol);
     }
 
+    function protegerEnlaces() {
+        if (usuarioActual()) return;
+        document.querySelectorAll('[data-requiere-sesion]').forEach((a) => {
+            const destino = new URL(a.getAttribute('href'), window.location.href);
+            a.href = '/auth/login.html?volver=' + encodeURIComponent(destino.pathname + destino.search);
+        });
+    }
+
     function pintarAdmin() {
         const esAdmin = tieneRol(usuarioActual(), 'Admin');
         document.querySelectorAll('[data-solo-admin]').forEach((el) => {
@@ -75,6 +83,7 @@
     function pintarNavbar() {
         enlazarVolver();
         pintarAdmin();
+        protegerEnlaces();
         const botones = document.getElementById('authButtons');
         const perfil = document.getElementById('menuPerfil');
         if (!botones || !perfil) return;
@@ -94,3 +103,4 @@
     window.Sesion = { guardar, cerrar, usuarioActual, destinoVolver, tieneRol, token: leer };
     document.addEventListener('DOMContentLoaded', pintarNavbar);
 })();
+
