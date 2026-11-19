@@ -46,6 +46,12 @@
                             <i class="bi bi-list"></i>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="nav-icon bi bi-film"></i>
+                            <span class="d-none d-sm-inline">Cartelera</span>
+                        </a>
+                    </li>
                 </ul>
 
                 <ul class="navbar-nav ms-auto">
@@ -585,7 +591,7 @@
                             $('perfil-tipo-publico').textContent = `Cuenta de ${datos?.[CLAIM_ROL] ?? datos?.role ?? '-'}`;
                             btnEditarPerfil.classList.add('d-none');
                             btnAbrirPassword.classList.add('d-none');
-                            mostrarAlerta('info', 'Tu usuario no tiene un perfil de cliente (por ejemplo, las cuentas de administrador).');
+                            mostrarAlerta('info', 'Tu usuario no tiene un perfil de cliente.');
                             return;
                         }
 
