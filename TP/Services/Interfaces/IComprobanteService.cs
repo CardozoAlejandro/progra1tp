@@ -9,6 +9,7 @@ namespace Cine_TP.Services.Interfaces
 {
     public interface IComprobanteService
     {
+        public record ResultadoCompra(Comprobante? Comprobante, int Status = 200, string? Mensaje = null);
         Task<List<Comprobante>> ObtenerComprobantesAsync();
         Task<Comprobante?> ObtenerComprobantePorIdAsync(int id);
         Task<bool> CrearComprobanteAsync(Comprobante comprobante);
@@ -16,5 +17,6 @@ namespace Cine_TP.Services.Interfaces
         Task<bool> BorrarComprobanteAsync(int id);
         Task<List<(string pelicula, decimal total)>> ObtenerIngresosPorPeliculaAsync();
         Task<List<(int anio, int mes, decimal total)>> ObtenerIngresosMensualesAsync();
+        Task<ResultadoCompra> ReservarEntradasAsync(int idFuncion, int cantidad, int? idUsuario, string? nombreUsuario);
     }
 }

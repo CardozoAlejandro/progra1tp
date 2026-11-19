@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Cine_TP.Domain;
-using CineWebApi.DTOs;
+﻿using Cine_TP.Domain;
 using Cine_TP.Services.Interfaces;
+using CineWebApi.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 namespace Cine_TP.Controllers
 {
     [Authorize]
@@ -35,23 +36,24 @@ namespace Cine_TP.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Comprobante comprobante)
+        public async Task<IActionResult> Create([FromBody] CrearComprobanteDTO dto)
         {
-            if (comprobante.ComprobanteDetalles == null || !comprobante.ComprobanteDetalles.Any())
-                return BadRequest(new { mensaje = "Un comprobante debe incluir al menos un detalle." });
+            int? idUsuario = int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id)
+                ? id : (int?)null;
 
-            try
-            {
-                var resultado = await _comprobanteService.CrearComprobanteAsync(comprobante);
-                if (!resultado)
-                    return StatusCode(500, new { mensaje = "Ocurrió un error al procesar el alta del comprobante." });
+            var r = await _comprobanteService.ReservarEntradasAsync(dto.IdFuncion, dto.Cantidad, idUsuario, User.Identity?.Name);
+            if (r.Comprobante == null)
+                return StatusCode(r.Status, new { mensaje = r.Mensaje });
 
-                return CreatedAtAction(nameof(GetById), new { id = comprobante.Id }, comprobante);
-            }
-            catch (Exception ex)
+            var c = r.Comprobante;
+            return Ok(new ComprobanteCreadoDTO
             {
-                return BadRequest(new { mensaje = ex.Message });
-            }
+                IdComprobante = c.Id,
+                Estado = c.Estado,
+                Cantidad = dto.Cantidad,
+                MontoTotal = c.MontoTotal,
+                FechaLimiteConfirmacion = c.FechaLimiteConfirmacion
+            });
         }
 
         [HttpPut("{id}/estado")]

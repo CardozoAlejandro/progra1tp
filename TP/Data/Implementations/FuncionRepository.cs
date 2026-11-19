@@ -27,10 +27,13 @@ namespace Cine_TP.Data.Implementations
         }
         public async Task<int> CountEntradasVendidasAsync(int idFuncion)
         {
+            var ahora = DateTime.Now;
             return await _context.ComprobanteDetalles
-                            .AsNoTracking()
-                            .CountAsync(d => d.Funcion!.Id == idFuncion
-                             && d.Comprobante!.Estado == EstadoComprobante.Confirmada);
+                .AsNoTracking()
+                .CountAsync(d => d.IdFuncion == idFuncion
+                              && d.ButacaOcupada
+                              && !(d.Comprobante!.Estado == EstadoComprobante.Pendiente
+                                   && d.Comprobante.FechaLimiteConfirmacion < ahora));
         }
         public async Task<List<Funcion>> GetFuncionesAsync(DateTime desde, DateTime hasta)
         {
@@ -47,6 +50,26 @@ namespace Cine_TP.Data.Implementations
                 .AsNoTracking()
                 .Where(f => f.IdPelicula == idPelicula && f.FechaHoraInicio >= desde)
                 .OrderBy(f => f.FechaHoraInicio)
+                .ToListAsync();
+        }
+        public async Task<List<Butaca>> GetButacasLibresAsync(int idFuncion, int? idSala, int cantidad)
+        {
+            var ahora = DateTime.Now;
+
+            var ocupadas = _context.ComprobanteDetalles
+                .Where(d => d.IdFuncion == idFuncion
+                         && d.ButacaOcupada
+                         && !(d.Comprobante!.Estado == EstadoComprobante.Pendiente
+                              && d.Comprobante.FechaLimiteConfirmacion < ahora))
+                .Select(d => d.IdButaca);
+
+            return await _context.Butacas
+                .AsNoTracking()
+                .Where(b => b.IdSala == idSala
+                         && (b.Estado == null || b.Estado == "Habilitada")
+                         && !ocupadas.Contains(b.Id))
+                .OrderBy(b => b.Fila).ThenBy(b => b.Numero)
+                .Take(cantidad)
                 .ToListAsync();
         }
     }

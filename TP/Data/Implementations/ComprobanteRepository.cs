@@ -113,7 +113,9 @@ namespace Cine_TP.Data.Implementations
 
         public async Task<bool> UpdateEstadoAsync(int id, string nuevoEstado)
         {
-            var comprobante = await _context.Comprobantes.FindAsync(id);
+            var comprobante = await _context.Comprobantes
+                    .Include(c => c.ComprobanteDetalles)
+                    .FirstOrDefaultAsync(c => c.Id == id);
             if (comprobante == null)
                 return false;
 
@@ -198,6 +200,17 @@ namespace Cine_TP.Data.Implementations
             .ToListAsync();
 
             return datos.Select(x => (x.Year, x.Month, x.Total)).ToList();
+        }
+
+        public async Task<int?> GetIdClienteAsync(int? idUsuario, string? nombreUsuario)
+        {
+            return await _context.Clientes
+                .AsNoTracking()
+                .Where(c => idUsuario != null
+                            ? c.IdUsuario == idUsuario
+                            : c.Usuario!.NombreUsuario == nombreUsuario)
+                .Select(c => (int?)c.Id)
+                .FirstOrDefaultAsync();
         }
     }
 }

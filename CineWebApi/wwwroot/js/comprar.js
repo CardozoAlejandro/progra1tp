@@ -1,7 +1,10 @@
 ﻿(async function () {
-    // Página del paso siguiente (todavía no existe)
-    const URL_SIGUIENTE = '/pago.html';
     const SEGUNDOS_TEMPORIZADOR = 10 * 60;
+    const modalEl = document.getElementById('modalConfirmar');
+    const modal = new bootstrap.Modal(modalEl);
+    const modalError = document.getElementById('modalError');
+    const btnConfirmar = document.getElementById('btnConfirmarCompra');
+    const selectPago = document.getElementById('formaPago');
 
     const idFuncion = new URLSearchParams(window.location.search).get('funcion');
 
@@ -48,6 +51,16 @@
         return r.json();
     }
 
+    async function cargarFormasPago() {
+        const r = await fetch('/api/formas-pago');
+        if (!r.ok) throw new Error('No se pudieron cargar las formas de pago.');
+        const lista = await r.json();
+
+        selectPago.replaceChildren(new Option('Seleccionar...', ''));
+        lista.forEach(f => selectPago.add(new Option(f.nombre, f.id)));
+    }
+
+    selectPago.addEventListener('change', () => { if (funcion) actualizar(); });
     function actualizar() {
         const max = funcion.disponibles;
         inputCantidad.value = cantidad;
@@ -55,7 +68,7 @@
         document.getElementById('compraDisponibles').textContent = max;
         btnMenos.disabled = !comprable || cantidad <= 0;
         btnMas.disabled = !comprable || cantidad >= max;
-        btnContinuar.disabled = !comprable || cantidad === 0;
+        btnContinuar.disabled = !comprable || cantidad === 0 || !selectPago.value;
     }
 
     function pintarFuncion() {
@@ -69,7 +82,6 @@
         document.getElementById('compraPrecio').textContent = formatoPrecio(funcion.precioBase);
         document.getElementById('btnAtras').href = `/pelicula.html?id=${encodeURIComponent(funcion.idPelicula)}`;
 
-        // Una función que ya empezó o que está agotada no se puede comprar
         const yaEmpezo = new Date(funcion.fechaHoraInicio) <= new Date();
         comprable = !yaEmpezo && funcion.disponibles > 0;
         if (yaEmpezo) {
@@ -83,7 +95,6 @@
         actualizar();
     }
 
-    // ===== Temporizador: al terminar se reinician la cantidad y los datos =====
     function pintarTemporizador() {
         const m = Math.floor(restante / 60);
         const s = String(restante % 60).padStart(2, '0');
@@ -95,6 +106,8 @@
         if (restante <= 0) {
             restante = SEGUNDOS_TEMPORIZADOR;
             cantidad = 0;
+            selectPago.value = '';
+            modal.hide();
             try {
                 funcion = await pedirFuncion();
                 pintarFuncion();
@@ -106,7 +119,6 @@
         pintarTemporizador();
     }, 1000);
 
-    // ===== Botones =====
     btnMenos.addEventListener('click', () => {
         if (cantidad > 0) { cantidad--; actualizar(); }
     });
@@ -118,20 +130,70 @@
     btnContinuar.addEventListener('click', () => {
         if (cantidad === 0) return;
 
-        // Hace falta sesión para comprar: va al login y vuelve a esta misma página
         if (!Sesion.usuarioActual()) {
             const aqui = window.location.pathname + window.location.search;
             window.location.href = '/auth/login.html?volver=' + encodeURIComponent(aqui);
             return;
         }
 
-        sessionStorage.setItem('cine_compra', JSON.stringify({ idFuncion: funcion.idFuncion, cantidad }));
-        window.location.href = URL_SIGUIENTE;
+        document.getElementById('modalPelicula').textContent = funcion.titulo;
+        document.getElementById('modalFecha').textContent = fechaHora(funcion.fechaHoraInicio);
+        document.getElementById('modalSala').textContent = `SALA ${funcion.idSala}`;
+        document.getElementById('modalCantidad').textContent = cantidad;
+        document.getElementById('modalTotal').textContent = formatoPrecio(cantidad * funcion.precioBase);
+        modalError.classList.add('d-none');
+        btnConfirmar.disabled = false;
+        document.getElementById('modalFormaPago').textContent =
+            selectPago.selectedOptions[0].textContent;
+        modal.show();
     });
 
-    // ===== Carga inicial =====
+    btnConfirmar.addEventListener('click', async () => {
+        btnConfirmar.disabled = true;
+        modalError.classList.add('d-none');
+
+        try {
+            const token = Sesion.token();
+            const r = await fetch('/api/comprobantes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({
+                    idFuncion: funcion.idFuncion,
+                    cantidad,
+                    idFormaPago: Number(selectPago.value)
+                })
+            });
+
+            if (r.status === 401) {
+                window.location.href = '/auth/login.html?volver=' +
+                    encodeURIComponent(window.location.pathname + window.location.search);
+                return;
+            }
+
+            const data = await r.json().catch(() => ({}));
+            if (!r.ok) throw new Error(data.mensaje || 'No se pudo registrar la compra.');
+
+            sessionStorage.setItem('cine_compra', JSON.stringify({
+                idComprobante: data.idComprobante,
+                idFuncion: funcion.idFuncion,
+                cantidad
+            }));
+            window.location.href = '/mi-cuenta.html?compra=' + data.idComprobante;
+        } catch (e) {
+            btnConfirmar.disabled = false;
+            try { funcion = await pedirFuncion(); pintarFuncion(); } catch { }
+            modal.hide();
+            aviso.textContent = e.message;
+            aviso.classList.remove('d-none');
+        }
+    });
+
     try {
         funcion = await pedirFuncion();
+        await cargarFormasPago();
     } catch (e) {
         fallo(e.message);
         return;
@@ -141,3 +203,4 @@
     estado.classList.add('d-none');
     contenido.hidden = false;
 })();
+

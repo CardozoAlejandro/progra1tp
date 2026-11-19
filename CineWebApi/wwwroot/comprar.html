@@ -284,6 +284,17 @@
                                         <span class="compra-temporizador" id="temporizador" role="timer" aria-live="off">10:00</span>
                                     </div>
                                 </div>
+                                <div class="card mt-4">
+                                    <div class="card-header">
+                                        <h2 class="card-title fs-5 fw-bold text-uppercase mb-0">Forma de pago</h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <label for="formaPago" class="form-label small">Seleccioná cómo vas a pagar</label>
+                                        <select id="formaPago" class="form-select">
+                                            <option value="">Cargando...</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="card-body">
                                     <div id="avisoFuncion" class="alert alert-warning d-none" role="alert"></div>
                                     <div class="table-responsive">
@@ -365,6 +376,37 @@
         </footer>
         <!--end::Footer-->
     </div>
+    <!--begin::Modal confirmar compra-->
+    <div class="modal fade" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarTitulo" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5 text-uppercase" id="modalConfirmarTitulo">Confirmar compra</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalError" class="alert alert-danger d-none" role="alert"></div>
+                    <p class="mb-2">Vas a comprar:</p>
+                    <ul class="list-unstyled mb-3">
+                        <li><strong id="modalPelicula"></strong></li>
+                        <li class="text-secondary" id="modalFecha"></li>
+                        <li class="text-secondary" id="modalSala"></li>
+                        <li>Entradas: <strong id="modalCantidad"></strong></li>
+                        <li>Forma de pago: <strong id="modalFormaPago"></strong></li>
+                    </ul>
+                    <div class="compra-total">
+                        <div class="small fw-semibold text-uppercase">Total</div>
+                        <div class="monto" id="modalTotal"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="btnCancelarModal">Cancelar</button>
+                    <button type="button" class="btn btn-compra" id="btnConfirmarCompra">Confirmar compra</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::Modal confirmar compra-->
     <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.16.0/browser/overlayscrollbars.browser.es6.min.js"
             crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
@@ -375,15 +417,15 @@
     <script src="/js/sesion.js"></script>
     <script src="/js/comprar.js"></script>
     <script>
-                                  document.addEventListener('DOMContentLoaded', function () {
-                                    const sidebarWrapper = document.querySelector('.sidebar-wrapper');
-                                    const isMobile = window.innerWidth <= 992;
-                                    if (sidebarWrapper && globalThis.OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined && !isMobile) {
-                                      OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-                                        scrollbars: { theme: 'os-theme-light', autoHide: 'leave', clickScroll: true },
-                                      });
-                                    }
-                                  });
+                                          document.addEventListener('DOMContentLoaded', function () {
+                                            const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+                                            const isMobile = window.innerWidth <= 992;
+                                            if (sidebarWrapper && globalThis.OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined && !isMobile) {
+                                              OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                                                scrollbars: { theme: 'os-theme-light', autoHide: 'leave', clickScroll: true },
+                                              });
+                                            }
+                                          });
     </script>
 </body>
 </html>

@@ -14,6 +14,7 @@ namespace Cine_TP.Data.Interfaces
         Task<Funcion?> GetFuncionByIdAsync(int id);
         Task<int> CountEntradasVendidasAsync(int idFuncion);
         Task<List<Funcion>> GetFuncionesPeliculasAsync(int idPelicula, DateTime desde);
+        Task<List<Butaca>> GetButacasLibresAsync(int idFuncion, int? idSala, int cantidad);
 
     }
 }

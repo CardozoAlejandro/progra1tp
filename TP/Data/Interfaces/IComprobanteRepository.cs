@@ -16,5 +16,6 @@ namespace Cine_TP.Data.Interfaces
         Task<bool> DeleteComprobanteAsync(int id);
         Task<List<(string pelicula, decimal total)>> GetIngresosAsync();
         Task<List<(int anio, int mes, decimal total)>> GetIngresosMensualesAsync();
+        Task<int?> GetIdClienteAsync(int? idUsuario, string? nombreUsuario);
     }
 }
