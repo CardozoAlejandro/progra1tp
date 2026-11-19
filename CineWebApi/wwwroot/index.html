@@ -112,42 +112,18 @@
                               <i class="bi bi-list"></i>
                           </a>
                       </li>
-
-                      <li class="nav-item d-none d-md-block">
-                          <a href="#" class="nav-link">
-                              <i class="bi bi-people me-1" aria-hidden="true"></i>
-                              Responsables
+                      <!--begin::Programación-->
+                      <li class="nav-item">
+                          <a href="programacion.html" class="nav-link">
+                              <i class="bi bi-calendar3 me-1" aria-hidden="true"></i>
+                              <span class="d-none d-sm-inline">Programación</span>
                           </a>
                       </li>
+                      <!--end::Programación-->
                   </ul>
                   <!--end::Start Navbar Links-->
-                  <!--begin::Navbar Search-->
-                  <form class="navbar-search d-none d-xl-block ms-3"
-                        role="search"
-                        action="./pages/search-results.html">
-                      <label for="navbar-search-input" class="visually-hidden">Search</label>
-                      <div class="navbar-search-field">
-                          <input type="search"
-                                 id="navbar-search-input"
-                                 name="q"
-                                 class="form-control"
-                                 placeholder="Search…"
-                                 autocomplete="off" />
-                          <button class="navbar-search-submit" type="submit" aria-label="Submit search">
-                              <i class="bi bi-search" aria-hidden="true"></i>
-                          </button>
-                      </div>
-                  </form>
-                  <!--end::Navbar Search-->
                   <!--begin::End Navbar Links-->
                   <ul class="navbar-nav ms-auto">
-                      <!--begin::Search (small screens: the field above is hidden, so link to the search page)-->
-                      <li class="nav-item d-xl-none">
-                          <a class="nav-link" href="./pages/search-results.html" aria-label="Search">
-                              <i class="bi bi-search" aria-hidden="true"></i>
-                          </a>
-                      </li>
-                      <!--end::Search-->
                       <!--begin::Color Mode Toggle (#6010)-->
                       <li class="nav-item dropdown">
                           <a class="nav-link"
@@ -992,14 +968,17 @@
           <!--begin::Footer-->
           <footer class="app-footer">
               <!--begin::To the end-->
-              <div class="float-end d-none d-sm-inline">Anything you want</div>
+              <div class="float-end">
+                  <a href="#" class="text-decoration-none">
+                      <i class="bi bi-people me-1" aria-hidden="true"></i>Responsables
+                  </a>
+              </div>
               <!--end::To the end-->
               <!--begin::Copyright-->
               <strong>
                   Copyright &copy; 2014-2026&nbsp;
-                  <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
+                  <a href="https://uvs.frc.utn.edu.ar/" class="text-decoration-none">TUP</a>.
               </strong>
-              All rights reserved.
               <!--end::Copyright-->
           </footer>
           <!--end::Footer-->
