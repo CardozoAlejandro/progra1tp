@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Cine_TP.Domain;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +8,10 @@ using System.Threading.Tasks;
 
 namespace Cine_TP.Data.Interfaces
 {
-    internal interface IFuncionRepository
+    public interface IFuncionRepository
     {
+        Task<List<Funcion>> GetFuncionesAsync(DateTime desde, DateTime hasta);
+        Task<List<Funcion>> GetFuncionesPeliculasAsync(int idPelicula, DateTime desde);
+
     }
 }

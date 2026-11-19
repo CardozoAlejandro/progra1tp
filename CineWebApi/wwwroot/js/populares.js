@@ -16,7 +16,7 @@
         return span;
     }
 
-    function crearCard(p, posicion) {
+    function crearCard(p, funciones) {
         const col = el('div', 'col');
         const card = el('div', 'card pelicula-card h-100');
         const cuerpo = el('div', 'card-body d-flex gap-3');
@@ -27,7 +27,11 @@
         poster.appendChild(placeholder);
 
         const info = el('div', 'pelicula-info flex-grow-1');
-        info.appendChild(el('h3', 'pelicula-titulo', p.titulo));
+        const titulo = el('h3', 'pelicula-titulo');
+        const enlace = el('a', '', p.titulo);
+        enlace.href = `/pelicula.html?id=${encodeURIComponent(p.id)}`;
+        titulo.appendChild(enlace);
+        info.appendChild(titulo);
 
         const meta = el('p', 'pelicula-meta');
         if (p.duracionMinutos) meta.appendChild(dato('bi-clock', `${p.duracionMinutos} min`));
@@ -48,6 +52,8 @@
             info.appendChild(clas);
         }
 
+        info.appendChild(Horarios.crearBloque(funciones, p.titulo));
+
         cuerpo.append(poster, info);
         card.appendChild(cuerpo);
         col.appendChild(card);
@@ -55,13 +61,23 @@
     }
 
     try {
-        const r = await fetch('/api/peliculas/mas-vendidas');
-        if (!r.ok) return;
+        const [r, horarios] = await Promise.all([
+            fetch('/api/peliculas/mas-vendidas'),
+            Horarios.cargar(),
+        ]);
+        if (!r.ok) {
+            console.warn('mas-vendidas: respuesta con estado', r.status);
+            return;
+        }
         const peliculas = await r.json();
-        if (!peliculas.length) return;
+        if (!peliculas.length) {
+            console.warn('mas-vendidas: la lista vino vacía');
+            return;
+        }
 
-        peliculas.forEach((p) => contenedor.appendChild(crearCard(p)));
+        peliculas.forEach((p) => contenedor.appendChild(crearCard(p, horarios.get(p.id) ?? [])));
         seccion.classList.remove('d-none');
-    } catch {
+    } catch (e) {
+        console.error('populares.js:', e);
     }
 })();

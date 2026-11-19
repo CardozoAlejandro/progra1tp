@@ -284,17 +284,18 @@
             crossorigin="anonymous"></script>
     <script src="./js/adminlte.js"></script>
     <script src="/js/sesion.js"></script>
+    <script src="/js/horarios.js"></script>
     <script src="/js/programacion.js"></script>
     <script>
-                          document.addEventListener('DOMContentLoaded', function () {
-                            const sidebarWrapper = document.querySelector('.sidebar-wrapper');
-                            const isMobile = window.innerWidth <= 992;
-                            if (sidebarWrapper && globalThis.OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined && !isMobile) {
-                              OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-                                scrollbars: { theme: 'os-theme-light', autoHide: 'leave', clickScroll: true },
-                              });
-                            }
-                          });
+                                  document.addEventListener('DOMContentLoaded', function () {
+                                    const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+                                    const isMobile = window.innerWidth <= 992;
+                                    if (sidebarWrapper && globalThis.OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined && !isMobile) {
+                                      OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                                        scrollbars: { theme: 'os-theme-light', autoHide: 'leave', clickScroll: true },
+                                      });
+                                    }
+                                  });
     </script>
 </body>
 </html>

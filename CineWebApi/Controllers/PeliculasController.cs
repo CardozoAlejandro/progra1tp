@@ -139,5 +139,25 @@ namespace CineWebApi.Controllers
                 mensaje = "Película actualizada correctamente."
             });
         }
+
+        [AllowAnonymous]
+        [HttpGet("{id}/detalle")]
+        public async Task<IActionResult> GetDetalle(int id)
+        {
+            var p = await _peliculaService.ObtenerPeliculaPorIdAsync(id);
+            if (p == null)
+                return NotFound(new { mensaje = $"No se encontró la película con ID {id}." });
+
+            return Ok(new PeliculaDetalleDTO
+            {
+                Id = p.Id,
+                Titulo = p.Titulo,
+                DuracionMinutos = p.DuracionMinutos,
+                Sinopsis = p.Sinopsis,
+                FechaEstreno = p.FechaEstreno,
+                Genero = p.Genero?.NombreGenero,
+                Clasificacion = p.Clasificacion?.Codigo
+            });
+        }
     }
 }

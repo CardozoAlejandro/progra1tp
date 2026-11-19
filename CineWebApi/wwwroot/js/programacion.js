@@ -26,7 +26,7 @@ function dato(etiqueta, valor) {
     return d;
 }
 
-function crearCard(p) {
+function crearCard(p, funciones) {
     const col = crear('div', 'col');
     const card = crear('div', 'card pelicula-card h-100');
     const cuerpo = crear('div', 'card-body d-flex gap-3');
@@ -47,7 +47,11 @@ function crearCard(p) {
     }
 
     const info = crear('div', 'pelicula-info flex-grow-1');
-    info.appendChild(crear('h2', 'pelicula-titulo', p.titulo));
+    const titulo = crear('h2', 'pelicula-titulo');
+    const enlace = crear('a', '', p.titulo);
+    enlace.href = `/pelicula.html?id=${encodeURIComponent(p.id)}`;
+    titulo.appendChild(enlace);
+    info.appendChild(titulo);
 
     const meta = crear('p', 'pelicula-meta');
     const duracion = crear('span');
@@ -62,6 +66,7 @@ function crearCard(p) {
     info.appendChild(lanzamiento);
 
     info.appendChild(dato('Clasificación', p.clasificacion ?? '-'));
+    info.appendChild(Horarios.crearBloque(funciones, p.titulo));
 
     cuerpo.append(poster, info);
     card.appendChild(cuerpo);
@@ -82,11 +87,14 @@ async function cargarCartelera(titulo = '') {
         const url = '/api/peliculas/en-cartelera' +
             (titulo ? `?titulo=${encodeURIComponent(titulo)}` : '');
 
-        const respuesta = await fetch(url, { signal: controlador.signal });
+        const [respuesta, horarios] = await Promise.all([
+            fetch(url, { signal: controlador.signal }),
+            Horarios.cargar(),
+        ]);
         if (!respuesta.ok) throw new Error(`Error ${respuesta.status}`);
 
         const peliculas = await respuesta.json();
-        contenedor.replaceChildren(...peliculas.map(crearCard));
+        contenedor.replaceChildren(...peliculas.map((p) => crearCard(p, horarios.get(p.id) ?? [])));
 
         if (peliculas.length === 0) {
             estado.textContent = titulo
