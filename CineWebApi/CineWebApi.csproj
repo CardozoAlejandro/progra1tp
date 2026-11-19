@@ -22,4 +22,8 @@
     <ProjectReference Include="..\TP\Cine TP.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\img\" />
+  </ItemGroup>
+
 </Project>

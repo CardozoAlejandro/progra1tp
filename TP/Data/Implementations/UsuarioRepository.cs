@@ -39,7 +39,7 @@ namespace Cine_TP.Data.Implementations
         public async Task<Usuario?> GetUserByNameAsync(string usuario)
         {
             return await _context.Usuarios
-                                 .Include(u => u.cl)
+                                 .Include(u => u.Cliente)
                                  .Where(u => u.NombreUsuario == usuario)
                                  .FirstOrDefaultAsync();
         }

@@ -147,7 +147,6 @@ namespace Cine_TP.Data.Implementations
             if (!string.IsNullOrWhiteSpace(promo.DiaSemana))
             {
                 string dia = referencia.ToString("dddd", cultura);
-                // Ignora mayúsculas y tildes ("Miércoles" == "miercoles")
                 if (string.Compare(dia, promo.DiaSemana.Trim(), cultura,
                         CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) != 0)
                     throw new InvalidOperationException(
