@@ -217,5 +217,17 @@ namespace Cine_TP.Data.Implementations
         {
             return await _context.FormasPago.AsNoTracking().AnyAsync(f => f.Id == id);
         }
+        public async Task<List<Comprobante>> GetComprobantesPorClienteAsync(int idCliente)
+        {
+            return await _context.Comprobantes
+                .AsNoTracking()
+                .Where(c => c.IdCliente == idCliente)
+                .Include(c => c.FormaPago)
+                .Include(c => c.Promocion)
+                .Include(c => c.ComprobanteDetalles).ThenInclude(d => d.Butaca)
+                .Include(c => c.ComprobanteDetalles).ThenInclude(d => d.Funcion).ThenInclude(f => f!.Pelicula)
+                .OrderByDescending(c => c.FechaHoraCreacion)
+                .ToListAsync();
+        }
     }
 }

@@ -99,5 +99,35 @@ namespace Cine_TP.Controllers
                 Total = x.total
             }));
         }
+
+        [HttpGet("mis-comprobantes")]
+        public async Task<IActionResult> MisComprobantes()
+        {
+            int? idUsuario = int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id)
+                ? id : (int?)null;
+
+            var lista = await _comprobanteService.ObtenerMisComprobantesAsync(idUsuario, User.Identity?.Name);
+
+            return Ok(lista.Select(c => new MiComprobanteDTO
+            {
+                IdComprobante = c.Id,
+                Estado = c.Estado,
+                FechaHoraCreacion = c.FechaHoraCreacion,
+                FechaHoraEmision = c.FechaHoraEmision,
+                MontoTotal = c.MontoTotal,
+                MontoFinal = c.MontoFinal,
+                FormaPago = c.FormaPago?.Nombre,
+                Promocion = c.Promocion?.NombrePromo,
+                Entradas = c.ComprobanteDetalles.Select(d => new MiEntradaDTO
+                {
+                    IdFuncion = d.IdFuncion,
+                    Pelicula = d.Funcion?.Pelicula?.Titulo ?? "-",
+                    FechaHoraInicio = d.Funcion?.FechaHoraInicio ?? default,
+                    IdSala = d.Funcion?.IdSala,
+                    Butaca = d.Butaca != null ? $"{d.Butaca.Fila}{d.Butaca.Numero}" : "-",
+                    Precio = d.PrecioBase
+                }).ToList()
+            }));
+        }
     }
 }

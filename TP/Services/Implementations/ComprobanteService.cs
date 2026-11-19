@@ -163,5 +163,15 @@ namespace Cine_TP.Services.Implementations
                 return new(null, 409, "Las entradas fueron tomadas por otra persona. Intentá de nuevo.");
             }
         }
+        public async Task<List<Comprobante>> ObtenerMisComprobantesAsync(int? idUsuario, string? nombreUsuario)
+        {
+            var idCliente = await _comprobanteRepository.GetIdClienteAsync(idUsuario, nombreUsuario);
+            if (idCliente == null)
+                return new List<Comprobante>();
+
+            return await _comprobanteRepository.GetComprobantesPorClienteAsync(idCliente.Value);
+        }
+
+
     }
 }

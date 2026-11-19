@@ -202,6 +202,7 @@
 
             <div class="app-content">
                 <div class="container-fluid">
+                    <div id="alertaCompra" class="alert alert-success d-none" role="alert"></div>
                     <div id="estado-perfil" class="alert alert-info d-none" role="alert"></div>
 
                     <div class="card" id="card-perfil">
@@ -321,6 +322,12 @@
                             </button>
                         </div>
                     </div>
+                    <section id="seccionCompras" class="mt-4">
+                        <h2 class="fs-4 mb-3">Mis compras</h2>
+                        <div id="errorComprobantes" class="alert alert-danger d-none" role="alert"></div>
+                        <p id="estadoComprobantes" class="text-center text-secondary my-4">Cargando tus compras...</p>
+                        <div id="listaComprobantes" class="row g-3"></div>
+                    </section>
                 </div>
             </div>
         </main>
@@ -343,255 +350,256 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script src="./js/adminlte.js"></script>
     <script src="/js/sesion.js"></script>
+    <script src="/js/mis-comprobantes.js"></script>
     <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const sidebarWrapper = document.querySelector('.sidebar-wrapper');
-                        const isMobile = window.innerWidth <= 992;
-                        if (sidebarWrapper && globalThis.OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined && !isMobile) {
-                            OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-                                scrollbars: { theme: 'os-theme-light', autoHide: 'leave', clickScroll: true },
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+                                const isMobile = window.innerWidth <= 992;
+                                if (sidebarWrapper && globalThis.OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined && !isMobile) {
+                                    OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                                        scrollbars: { theme: 'os-theme-light', autoHide: 'leave', clickScroll: true },
+                                    });
+                                }
                             });
+    </script>
+    <script>
+(async () => {
+                    const CLAIM_NOMBRE = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name';
+                    const CLAIM_ROL = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+
+                    const $ = (id) => document.getElementById(id);
+                    const alerta = $('estado-perfil');
+                    const accionesPerfil = $('acciones-perfil');
+                    const btnEditarPerfil = $('btnEditarPerfil');
+                    const btnCancelarEdicion = $('btnCancelarEdicion');
+                    const btnGuardarPerfil = $('btnGuardarPerfil');
+                    const btnAbrirPassword = $('btnAbrirPassword');
+                    const btnCancelarPassword = $('btnCancelarPassword');
+                    const btnGuardarPassword = $('btnGuardarPassword');
+                    const btnCerrarSesion = $('btnCerrarSesion');
+                    const vistaLectura = $('vista-lectura');
+                    const formEditar = $('form-editar-perfil');
+                    const formPassword = $('form-cambiar-password');
+
+                    let perfilActual = null;
+
+                    // ===== Utilidades =====
+                    function mostrarAlerta(tipo, texto) {
+                        alerta.className = 'alert alert-' + tipo;
+                        alerta.textContent = texto;
+                        alerta.classList.remove('d-none');
+                    }
+
+                    function ocultarAlerta() {
+                        alerta.classList.add('d-none');
+                    }
+
+                    async function textoDeError(resp, porDefecto) {
+                        try {
+                            const datos = await resp.json();
+                            if (datos.mensaje) return datos.mensaje;
+                            if (datos.errors) return Object.values(datos.errors).flat().join(' ');
+                        } catch { /* la respuesta no era JSON */ }
+                        return porDefecto;
+                    }
+
+                    function irAlLogin() {
+                        window.location.href = '/auth/login.html?volver=' + encodeURIComponent('/mi-cuenta.html');
+                    }
+
+                    function cerrarSesion() {
+                        Sesion.cerrar(false);
+                        window.location.href = './index.html';
+                    }
+
+                    // usuarioActual() da null si no hay token o ya venció
+                    function obtenerToken() {
+                        return Sesion.usuarioActual() ? Sesion.token() : '';
+                    }
+
+                    function cabeceras(conJson = false) {
+                        const h = { Authorization: `Bearer ${obtenerToken()}`, Accept: 'application/json' };
+                        if (conJson) h['Content-Type'] = 'application/json';
+                        return h;
+                    }
+
+                    function formatearFecha(valor) {
+                        if (!valor) return '-';
+                        const fecha = new Date(valor);
+                        return Number.isNaN(fecha.getTime()) ? String(valor) : fecha.toLocaleDateString('es-AR');
+                    }
+
+                    // ===== Render =====
+                    function renderizarPerfil(data) {
+                        perfilActual = data;
+
+                        const nombre = data.nombre ?? data.Nombre ?? '';
+                        const apellido = data.apellido ?? data.Apellido ?? '';
+                        const dni = data.dni ?? data.Dni ?? '-';
+                        const email = data.email ?? data.Email ?? '-';
+                        const telefono = data.telefono ?? data.Telefono ?? '';
+                        const fechaRaw = data.fechaNacimiento ?? data.FechaNacimiento;
+                        const tipoPublico = data.idTipoPublico ?? data.IdTipoPublico;
+                        const textoTipo = tipoPublico !== null && tipoPublico !== undefined ? `ID ${tipoPublico}` : '-';
+
+                        $('perfil-nombre-completo').textContent = `${nombre} ${apellido}`.trim() || '-';
+                        $('perfil-dni').textContent = dni;
+                        $('perfil-email').textContent = email;
+                        $('perfil-telefono').textContent = telefono || 'No informado';
+                        $('perfil-fecha-nac').textContent = formatearFecha(fechaRaw);
+                        $('perfil-tipo-publico').textContent = textoTipo;
+
+                        // Precarga del formulario de edición
+                        $('edit-nombre').value = nombre;
+                        $('edit-apellido').value = apellido;
+                        $('edit-email').value = email === '-' ? '' : email;
+                        $('edit-telefono').value = telefono;
+                        $('edit-dni').value = dni;
+                        $('edit-fecha-nac').value = formatearFecha(fechaRaw);
+                        $('edit-tipo-publico').value = textoTipo;
+                    }
+
+                    function mostrarVista(vista) {
+                        vistaLectura.classList.toggle('d-none', vista !== 'lectura');
+                        formEditar.classList.toggle('d-none', vista !== 'editar');
+                        formPassword.classList.toggle('d-none', vista !== 'password');
+                        btnEditarPerfil.classList.toggle('d-none', vista !== 'lectura');
+                        btnAbrirPassword.classList.toggle('d-none', vista !== 'lectura');
+
+                        if (vista === 'lectura' && perfilActual) renderizarPerfil(perfilActual);
+                        if (vista === 'password') formPassword.reset();
+                    }
+
+                    // ===== Botones =====
+                    btnCerrarSesion.addEventListener('click', cerrarSesion);
+                    btnEditarPerfil.addEventListener('click', () => { ocultarAlerta(); mostrarVista('editar'); });
+                    btnCancelarEdicion.addEventListener('click', () => { ocultarAlerta(); mostrarVista('lectura'); });
+                    btnAbrirPassword.addEventListener('click', () => { ocultarAlerta(); mostrarVista('password'); });
+                    btnCancelarPassword.addEventListener('click', () => { ocultarAlerta(); mostrarVista('lectura'); });
+
+                    // ===== Guardar datos =====
+                    formEditar.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        if (!obtenerToken()) { irAlLogin(); return; }
+
+                        const nombre = $('edit-nombre').value.trim();
+                        const apellido = $('edit-apellido').value.trim();
+                        const email = $('edit-email').value.trim();
+                        const telefono = $('edit-telefono').value.trim();
+
+                        if (!nombre || !apellido || !email) {
+                            mostrarAlerta('warning', 'Nombre, apellido y email son obligatorios.');
+                            return;
+                        }
+
+                        btnGuardarPerfil.disabled = true;
+                        mostrarAlerta('info', 'Guardando cambios en tu perfil...');
+                        try {
+                            const resp = await fetch('/api/clientes/me', {
+                                method: 'PUT',
+                                headers: cabeceras(true),
+                                body: JSON.stringify({ nombre, apellido, email, telefono: telefono || null }),
+                            });
+                            if (!resp.ok) {
+                                mostrarAlerta('danger', await textoDeError(resp, 'No se pudieron guardar los cambios.'));
+                                return;
+                            }
+                            renderizarPerfil(await resp.json());
+                            mostrarVista('lectura');
+                            mostrarAlerta('success', 'Tus datos se actualizaron correctamente.');
+                        } catch {
+                            mostrarAlerta('danger', 'Error de conexión al intentar guardar los cambios.');
+                        } finally {
+                            btnGuardarPerfil.disabled = false;
                         }
                     });
-    </script>
-<script>
-(async () => {
-            const CLAIM_NOMBRE = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name';
-            const CLAIM_ROL = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
 
-            const $ = (id) => document.getElementById(id);
-            const alerta = $('estado-perfil');
-            const accionesPerfil = $('acciones-perfil');
-            const btnEditarPerfil = $('btnEditarPerfil');
-            const btnCancelarEdicion = $('btnCancelarEdicion');
-            const btnGuardarPerfil = $('btnGuardarPerfil');
-            const btnAbrirPassword = $('btnAbrirPassword');
-            const btnCancelarPassword = $('btnCancelarPassword');
-            const btnGuardarPassword = $('btnGuardarPassword');
-            const btnCerrarSesion = $('btnCerrarSesion');
-            const vistaLectura = $('vista-lectura');
-            const formEditar = $('form-editar-perfil');
-            const formPassword = $('form-cambiar-password');
+                    // ===== Cambiar contraseña =====
+                    formPassword.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        if (!obtenerToken()) { irAlLogin(); return; }
 
-            let perfilActual = null;
+                        const passwordActual = $('pass-actual').value;
+                        const passwordNueva = $('pass-nueva').value;
+                        const passwordConfirmar = $('pass-confirmar').value;
 
-            // ===== Utilidades =====
-            function mostrarAlerta(tipo, texto) {
-                alerta.className = 'alert alert-' + tipo;
-                alerta.textContent = texto;
-                alerta.classList.remove('d-none');
-            }
+                        if (!passwordActual || !passwordNueva || !passwordConfirmar) {
+                            mostrarAlerta('warning', 'Completá la contraseña actual, la nueva contraseña y su confirmación.');
+                            return;
+                        }
+                        if (passwordNueva === passwordActual) {
+                            mostrarAlerta('warning', 'La nueva contraseña no puede ser igual a la contraseña actual.');
+                            return;
+                        }
+                        if (passwordNueva.length < 6) {
+                            mostrarAlerta('warning', 'La nueva contraseña debe tener al menos 6 caracteres.');
+                            return;
+                        }
+                        if (passwordNueva !== passwordConfirmar) {
+                            mostrarAlerta('warning', 'La nueva contraseña y su confirmación no coinciden.');
+                            return;
+                        }
 
-            function ocultarAlerta() {
-                alerta.classList.add('d-none');
-            }
-
-            async function textoDeError(resp, porDefecto) {
-                try {
-                    const datos = await resp.json();
-                    if (datos.mensaje) return datos.mensaje;
-                    if (datos.errors) return Object.values(datos.errors).flat().join(' ');
-                } catch { /* la respuesta no era JSON */ }
-                return porDefecto;
-            }
-
-            function irAlLogin() {
-                window.location.href = '/auth/login.html?volver=' + encodeURIComponent('/mi-cuenta.html');
-            }
-
-            function cerrarSesion() {
-                Sesion.cerrar(false);
-                window.location.href = './index.html';
-            }
-
-            // usuarioActual() da null si no hay token o ya venció
-            function obtenerToken() {
-                return Sesion.usuarioActual() ? Sesion.token() : '';
-            }
-
-            function cabeceras(conJson = false) {
-                const h = { Authorization: `Bearer ${obtenerToken()}`, Accept: 'application/json' };
-                if (conJson) h['Content-Type'] = 'application/json';
-                return h;
-            }
-
-            function formatearFecha(valor) {
-                if (!valor) return '-';
-                const fecha = new Date(valor);
-                return Number.isNaN(fecha.getTime()) ? String(valor) : fecha.toLocaleDateString('es-AR');
-            }
-
-            // ===== Render =====
-            function renderizarPerfil(data) {
-                perfilActual = data;
-
-                const nombre = data.nombre ?? data.Nombre ?? '';
-                const apellido = data.apellido ?? data.Apellido ?? '';
-                const dni = data.dni ?? data.Dni ?? '-';
-                const email = data.email ?? data.Email ?? '-';
-                const telefono = data.telefono ?? data.Telefono ?? '';
-                const fechaRaw = data.fechaNacimiento ?? data.FechaNacimiento;
-                const tipoPublico = data.idTipoPublico ?? data.IdTipoPublico;
-                const textoTipo = tipoPublico !== null && tipoPublico !== undefined ? `ID ${tipoPublico}` : '-';
-
-                $('perfil-nombre-completo').textContent = `${nombre} ${apellido}`.trim() || '-';
-                $('perfil-dni').textContent = dni;
-                $('perfil-email').textContent = email;
-                $('perfil-telefono').textContent = telefono || 'No informado';
-                $('perfil-fecha-nac').textContent = formatearFecha(fechaRaw);
-                $('perfil-tipo-publico').textContent = textoTipo;
-
-                // Precarga del formulario de edición
-                $('edit-nombre').value = nombre;
-                $('edit-apellido').value = apellido;
-                $('edit-email').value = email === '-' ? '' : email;
-                $('edit-telefono').value = telefono;
-                $('edit-dni').value = dni;
-                $('edit-fecha-nac').value = formatearFecha(fechaRaw);
-                $('edit-tipo-publico').value = textoTipo;
-            }
-
-            function mostrarVista(vista) {
-                vistaLectura.classList.toggle('d-none', vista !== 'lectura');
-                formEditar.classList.toggle('d-none', vista !== 'editar');
-                formPassword.classList.toggle('d-none', vista !== 'password');
-                btnEditarPerfil.classList.toggle('d-none', vista !== 'lectura');
-                btnAbrirPassword.classList.toggle('d-none', vista !== 'lectura');
-
-                if (vista === 'lectura' && perfilActual) renderizarPerfil(perfilActual);
-                if (vista === 'password') formPassword.reset();
-            }
-
-            // ===== Botones =====
-            btnCerrarSesion.addEventListener('click', cerrarSesion);
-            btnEditarPerfil.addEventListener('click', () => { ocultarAlerta(); mostrarVista('editar'); });
-            btnCancelarEdicion.addEventListener('click', () => { ocultarAlerta(); mostrarVista('lectura'); });
-            btnAbrirPassword.addEventListener('click', () => { ocultarAlerta(); mostrarVista('password'); });
-            btnCancelarPassword.addEventListener('click', () => { ocultarAlerta(); mostrarVista('lectura'); });
-
-            // ===== Guardar datos =====
-            formEditar.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if (!obtenerToken()) { irAlLogin(); return; }
-
-                const nombre = $('edit-nombre').value.trim();
-                const apellido = $('edit-apellido').value.trim();
-                const email = $('edit-email').value.trim();
-                const telefono = $('edit-telefono').value.trim();
-
-                if (!nombre || !apellido || !email) {
-                    mostrarAlerta('warning', 'Nombre, apellido y email son obligatorios.');
-                    return;
-                }
-
-                btnGuardarPerfil.disabled = true;
-                mostrarAlerta('info', 'Guardando cambios en tu perfil...');
-                try {
-                    const resp = await fetch('/api/clientes/me', {
-                        method: 'PUT',
-                        headers: cabeceras(true),
-                        body: JSON.stringify({ nombre, apellido, email, telefono: telefono || null }),
+                        btnGuardarPassword.disabled = true;
+                        mostrarAlerta('info', 'Actualizando contraseña...');
+                        try {
+                            const resp = await fetch('/api/clientes/me/password', {
+                                method: 'PUT',
+                                headers: cabeceras(true),
+                                body: JSON.stringify({ passwordActual, passwordNueva }),
+                            });
+                            if (!resp.ok) {
+                                mostrarAlerta('danger', await textoDeError(resp, 'No se pudo cambiar la contraseña.'));
+                                return;
+                            }
+                            mostrarVista('lectura');
+                            mostrarAlerta('success', 'Contraseña actualizada correctamente.');
+                        } catch {
+                            mostrarAlerta('danger', 'Error de conexión al intentar cambiar la contraseña.');
+                        } finally {
+                            btnGuardarPassword.disabled = false;
+                        }
                     });
-                    if (!resp.ok) {
-                        mostrarAlerta('danger', await textoDeError(resp, 'No se pudieron guardar los cambios.'));
+
+                    // ===== Carga inicial =====
+                    if (!obtenerToken()) {
+                        irAlLogin();
                         return;
                     }
-                    renderizarPerfil(await resp.json());
-                    mostrarVista('lectura');
-                    mostrarAlerta('success', 'Tus datos se actualizaron correctamente.');
-                } catch {
-                    mostrarAlerta('danger', 'Error de conexión al intentar guardar los cambios.');
-                } finally {
-                    btnGuardarPerfil.disabled = false;
-                }
-            });
+                    accionesPerfil.classList.remove('d-none');
+                    mostrarAlerta('info', 'Cargando datos de tu perfil...');
 
-            // ===== Cambiar contraseña =====
-            formPassword.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if (!obtenerToken()) { irAlLogin(); return; }
+                    try {
+                        const resp = await fetch('/api/clientes/me', { headers: cabeceras() });
 
-                const passwordActual = $('pass-actual').value;
-                const passwordNueva = $('pass-nueva').value;
-                const passwordConfirmar = $('pass-confirmar').value;
+                        if (resp.status === 401) {
+                            Sesion.cerrar(false);
+                            irAlLogin();
+                            return;
+                        }
 
-                if (!passwordActual || !passwordNueva || !passwordConfirmar) {
-                    mostrarAlerta('warning', 'Completá la contraseña actual, la nueva contraseña y su confirmación.');
-                    return;
-                }
-                if (passwordNueva === passwordActual) {
-                    mostrarAlerta('warning', 'La nueva contraseña no puede ser igual a la contraseña actual.');
-                    return;
-                }
-                if (passwordNueva.length < 6) {
-                    mostrarAlerta('warning', 'La nueva contraseña debe tener al menos 6 caracteres.');
-                    return;
-                }
-                if (passwordNueva !== passwordConfirmar) {
-                    mostrarAlerta('warning', 'La nueva contraseña y su confirmación no coinciden.');
-                    return;
-                }
+                        // Cuentas sin perfil de cliente (por ejemplo, administrador)
+                        if (resp.status === 403) {
+                            const datos = Sesion.usuarioActual();
+                            $('perfil-nombre-completo').textContent = datos?.[CLAIM_NOMBRE] ?? datos?.unique_name ?? '-';
+                            $('perfil-tipo-publico').textContent = `Cuenta de ${datos?.[CLAIM_ROL] ?? datos?.role ?? '-'}`;
+                            btnEditarPerfil.classList.add('d-none');
+                            btnAbrirPassword.classList.add('d-none');
+                            mostrarAlerta('info', 'Tu usuario no tiene un perfil de cliente (por ejemplo, las cuentas de administrador).');
+                            return;
+                        }
 
-                btnGuardarPassword.disabled = true;
-                mostrarAlerta('info', 'Actualizando contraseña...');
-                try {
-                    const resp = await fetch('/api/clientes/me/password', {
-                        method: 'PUT',
-                        headers: cabeceras(true),
-                        body: JSON.stringify({ passwordActual, passwordNueva }),
-                    });
-                    if (!resp.ok) {
-                        mostrarAlerta('danger', await textoDeError(resp, 'No se pudo cambiar la contraseña.'));
-                        return;
+                        if (!resp.ok) {
+                            mostrarAlerta('danger', await textoDeError(resp, `No se pudo obtener el perfil (código ${resp.status}).`));
+                            return;
+                        }
+
+                        renderizarPerfil(await resp.json());
+                        ocultarAlerta();
+                    } catch {
+                        mostrarAlerta('danger', 'Error de conexión al consultar el perfil.');
                     }
-                    mostrarVista('lectura');
-                    mostrarAlerta('success', 'Contraseña actualizada correctamente.');
-                } catch {
-                    mostrarAlerta('danger', 'Error de conexión al intentar cambiar la contraseña.');
-                } finally {
-                    btnGuardarPassword.disabled = false;
-                }
-            });
-
-            // ===== Carga inicial =====
-            if (!obtenerToken()) {
-                irAlLogin();
-                return;
-            }
-            accionesPerfil.classList.remove('d-none');
-            mostrarAlerta('info', 'Cargando datos de tu perfil...');
-
-            try {
-                const resp = await fetch('/api/clientes/me', { headers: cabeceras() });
-
-                if (resp.status === 401) {
-                    Sesion.cerrar(false);
-                    irAlLogin();
-                    return;
-                }
-
-                // Cuentas sin perfil de cliente (por ejemplo, administrador)
-                if (resp.status === 403) {
-                    const datos = Sesion.usuarioActual();
-                    $('perfil-nombre-completo').textContent = datos?.[CLAIM_NOMBRE] ?? datos?.unique_name ?? '-';
-                    $('perfil-tipo-publico').textContent = `Cuenta de ${datos?.[CLAIM_ROL] ?? datos?.role ?? '-'}`;
-                    btnEditarPerfil.classList.add('d-none');
-                    btnAbrirPassword.classList.add('d-none');
-                    mostrarAlerta('info', 'Tu usuario no tiene un perfil de cliente (por ejemplo, las cuentas de administrador).');
-                    return;
-                }
-
-                if (!resp.ok) {
-                    mostrarAlerta('danger', await textoDeError(resp, `No se pudo obtener el perfil (código ${resp.status}).`));
-                    return;
-                }
-
-                renderizarPerfil(await resp.json());
-                ocultarAlerta();
-            } catch {
-                mostrarAlerta('danger', 'Error de conexión al consultar el perfil.');
-            }
 })();
-</script>
+    </script>
 </body>
 </html>
