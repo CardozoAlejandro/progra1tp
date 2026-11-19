@@ -70,6 +70,12 @@
                             <i class="bi bi-list"></i>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="nav-icon bi bi-film"></i>
+                            <span class="d-none d-sm-inline">Cartelera</span>
+                        </a>
+                    </li>
                 </ul>
 
                 <ul class="navbar-nav ms-auto">
@@ -193,13 +199,13 @@
                             <!-- Subopciones -->
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="./listapeliculas.html" class="nav-link">
+                                    <a href="./listapeliculas.html" class="nav-link active">
                                         <i class="nav-icon bi bi-circle"></i>
                                         <p>Lista de películas</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="./estadisticas.html" class="nav-link active"
+                                    <a href="./estadisticas.html" class="nav-link"
                                        aria-current="page">
                                         <i class="nav-icon bi bi-circle"></i>
                                         <p>Estadísticas</p>
@@ -208,6 +214,7 @@
                             </ul>
                         </li>
                         <!--end::Panel de administrador-->
+
                     </ul>
                 </nav>
             </div>
@@ -228,7 +235,7 @@
                 <nav aria-label="breadcrumb">
                   <ol class="breadcrumb float-sm-end">
                     <li class="breadcrumb-item"><a href="./index.html">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Chart.js</li>
+                    <li class="breadcrumb-item active" aria-current="page">Estadísticas</li>
                   </ol>
                 </nav>
               </div>
@@ -250,8 +257,6 @@
                 <div class="card h-100">
                     <div class="card-header">
                         <h3 class="card-title">Ingresos Mensuales</h3>
-                        <canvas id="line-chart" role="img"
-                                aria-label="Gráfico de líneas de ingresos totales del cine por mes"></canvas><
                         <div class="card-tools">
                             <button type="button"
                                     class="btn btn-tool"
@@ -264,13 +269,10 @@
                     </div>
                   <!-- /.card-header -->
                   <div class="card-body">
-                    <div class="position-relative" style="height: 300px">
-                      <canvas
-                        id="line-chart"
-                        role="img"
-                        aria-label="Line chart of monthly revenue, January to December"
-                      ></canvas>
-                    </div>
+                      <div class="position-relative" style="height: 300px">
+                          <canvas id="line-chart" role="img"
+                                  aria-label="Gráfico de líneas de ingresos totales del cine por mes"></canvas>
+                      </div>
                   </div>
                   <!-- /.card-body -->
                 </div>
@@ -282,7 +284,7 @@
                 <!--begin::Card-->
                 <div class="card h-100">
                   <div class="card-header">
-                    <h3 class="card-title">Gráfico de áreas</h3>
+                      <h3 class="card-title">Top 10 películas por ingresos</h3>
 
                     <div class="card-tools">
                       <button
@@ -298,147 +300,9 @@
                   </div>
                   <!-- /.card-header -->
                   <div class="card-body">
-                    <div class="position-relative" style="height: 300px">
-                      <canvas
-                        id="area-chart"
-                        role="img"
-                        aria-label="Area chart of new and returning visitors, January to July 2025"
-                      ></canvas>
-                    </div>
-                  </div>
-                  <!-- /.card-body -->
-                </div>
-                <!--end::Card-->
-              </div>
-              <!--end::Col-->
-              <!--begin::Col-->
-              <div class="col-12 col-lg-6">
-                <!--begin::Card-->
-                <div class="card h-100">
-                  <div class="card-header">
-                    <h3 class="card-title">Gráfico de columnas</h3>
-
-                    <div class="card-tools">
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        data-lte-toggle="card-collapse"
-                        aria-label="Collapse card"
-                      >
-                        <i data-lte-icon="expand" class="bi bi-plus-lg"></i>
-                        <i data-lte-icon="collapse" class="bi bi-dash-lg"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <!-- /.card-header -->
-                  <div class="card-body">
-                    <div class="position-relative" style="height: 300px">
-                      <canvas
-                        id="column-chart"
-                        role="img"
-                        aria-label="Column chart of online store and retail store sales per quarter of 2025"
-                      ></canvas>
-                    </div>
-                  </div>
-                  <!-- /.card-body -->
-                </div>
-                <!--end::Card-->
-              </div>
-              <!--end::Col-->
-              <!--begin::Col-->
-              <div class="col-12 col-lg-6">
-                <!--begin::Card-->
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h3 class="card-title">Top 10 películas por ingresos</h3>
+                    <div class="position-relative" style="height: 350px">
                         <canvas id="donut-chart" role="img"
                                 aria-label="Gráfico de anillo de los ingresos de las 10 películas más rentables"></canvas>
-                        <div class="card-tools">
-                            <button type="button"
-                                    class="btn btn-tool"
-                                    data-lte-toggle="card-collapse"
-                                    aria-label="Collapse card">
-                                <i data-lte-icon="expand" class="bi bi-plus-lg"></i>
-                                <i data-lte-icon="collapse" class="bi bi-dash-lg"></i>
-                            </button>
-                        </div>
-                    </div>
-                  <!-- /.card-header -->
-                  <div class="card-body">
-                    <div class="position-relative" style="height: 350px">
-                      <canvas
-                        id="donut-chart"
-                        role="img"
-                        aria-label="Donut chart of traffic sources"
-                      ></canvas>
-                    </div>
-                  </div>
-                  <!-- /.card-body -->
-                </div>
-                <!--end::Card-->
-              </div>
-              <!--end::Col-->
-              <!--begin::Col-->
-              <div class="col-12 col-lg-6">
-                <!--begin::Card-->
-                <div class="card h-100">
-                  <div class="card-header">
-                    <h3 class="card-title">Indicadores</h3>
-
-                    <div class="card-tools">
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        data-lte-toggle="card-collapse"
-                        aria-label="Collapse card"
-                      >
-                        <i data-lte-icon="expand" class="bi bi-plus-lg"></i>
-                        <i data-lte-icon="collapse" class="bi bi-dash-lg"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <!-- /.card-header -->
-                  <div class="card-body">
-                    <div class="position-relative" style="height: 350px">
-                      <canvas
-                        id="radialbar-chart"
-                        role="img"
-                        aria-label="Radial bar chart of goal completion for sales, marketing and support"
-                      ></canvas>
-                    </div>
-                  </div>
-                  <!-- /.card-body -->
-                </div>
-                <!--end::Card-->
-              </div>
-              <!--end::Col-->
-              <!--begin::Col-->
-              <div class="col-12 col-lg-6">
-                <!--begin::Card-->
-                <div class="card h-100">
-                  <div class="card-header">
-                    <h3 class="card-title">Gráfico combinado</h3>
-
-                    <div class="card-tools">
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        data-lte-toggle="card-collapse"
-                        aria-label="Collapse card"
-                      >
-                        <i data-lte-icon="expand" class="bi bi-plus-lg"></i>
-                        <i data-lte-icon="collapse" class="bi bi-dash-lg"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <!-- /.card-header -->
-                  <div class="card-body">
-                    <div class="position-relative" style="height: 300px">
-                      <canvas
-                        id="mixed-chart"
-                        role="img"
-                        aria-label="Mixed chart of monthly orders and revenue"
-                      ></canvas>
                     </div>
                   </div>
                   <!-- /.card-body -->

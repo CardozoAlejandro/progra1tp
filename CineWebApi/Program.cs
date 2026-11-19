@@ -62,7 +62,9 @@ builder.Services.AddScoped<IComprobanteRepository, ComprobanteRepository>();
 builder.Services.AddScoped<IPeliculaRepository, PeliculaRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+builder.Services.AddScoped<ICatalogoRepository, CatalogoRepository>();
 // Registrar Servicios
+builder.Services.AddScoped<ICatalogoService, CatalogoService>();
 builder.Services.AddScoped<IComprobanteService, ComprobanteService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPeliculaService, PeliculaService>();

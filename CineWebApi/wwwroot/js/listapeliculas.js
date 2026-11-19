@@ -19,7 +19,7 @@ async function mensajeDeError(respuesta, porDefecto) {
     try {
         const datos = await respuesta.json();
         if (datos.mensaje) return datos.mensaje;
-    } catch { /* la respuesta no era JSON */ }
+    } catch {  }
     return porDefecto;
 }
 
@@ -29,8 +29,6 @@ function formatearFecha(valor) {
     return `${dia}/${mes}/${anio}`;
 }
 
-// La API devuelve la entidad Pelicula (con Genero y Clasificacion anidados);
-// la aplanamos para que Tabulator pueda filtrar y ordenar por cada columna.
 function normalizar(p) {
     return {
         id: p.id,
@@ -40,6 +38,9 @@ function normalizar(p) {
         duracionMinutos: p.duracionMinutos,
         fechaEstreno: p.fechaEstreno ?? '',
         estado: p.estado,
+        sinopsis: p.sinopsis ?? '',
+        idGenero: p.idGenero ?? p.genero?.id ?? null,
+        idClasificacion: p.idClasificacion ?? p.clasificacion?.id ?? null,
     };
 }
 
@@ -49,7 +50,6 @@ function aplicarClaseEstado(select, estado) {
     select.classList.toggle('estado-suspendido', !enCartelera);
 }
 
-// Columna "Estado": un <select> En cartelera / Fuera de cartelera
 function selectorEstado(cell) {
     const pelicula = cell.getData();
     let estadoActual = pelicula.estado;
@@ -73,19 +73,18 @@ function selectorEstado(cell) {
         select.disabled = true;
         errorBox.classList.add('d-none');
         try {
-            // El endpoint recibe el estado por query string: PUT /api/peliculas/{id}/estado?estado=...
             const r = await fetch(
                 `/api/peliculas/${pelicula.id}/estado?estado=${encodeURIComponent(nuevo)}`,
                 { method: 'PUT', headers: cabeceras() }
             );
             if (!r.ok) {
-                select.value = estadoActual; // vuelve al valor anterior
+                select.value = estadoActual;
                 mostrarError(await mensajeDeError(r, 'No se pudo cambiar el estado.'));
                 return;
             }
             estadoActual = nuevo;
             aplicarClaseEstado(select, nuevo);
-            cell.getRow().update({ estado: nuevo }); // refresca la fila
+            cell.getRow().update({ estado: nuevo });
         } catch {
             select.value = estadoActual;
             mostrarError('No se pudo conectar con el servidor.');
@@ -175,6 +174,34 @@ function crearTabla(datos) {
                     elementAttributes: { 'aria-label': 'Filtrar por estado' },
                 },
             },
+            {
+                title: 'Acciones',
+                field: 'acciones',
+                width: 90,
+                hozAlign: 'center',
+                headerSort: false,
+                formatter: (cell) => {
+                    const boton = document.createElement('button');
+                    boton.type = 'button';
+                    boton.className = 'btn btn-primary btn-sm';
+                    boton.style.width = '32px';
+                    boton.style.height = '32px';
+                    boton.style.padding = '0';
+                    boton.title = 'Editar película';
+                    boton.setAttribute('aria-label', 'Editar ' + cell.getData().titulo);
+
+                    const icono = document.createElement('i');
+                    icono.className = 'bi bi-pencil-fill';
+
+                    boton.appendChild(icono);
+
+                    boton.addEventListener('click', () => {
+                        editarPelicula(cell.getData());
+                    });
+
+                    return boton;
+                },
+            },
         ],
     });
 
@@ -191,40 +218,191 @@ function crearTabla(datos) {
         });
     });
 
-    document.getElementById('table-filter').addEventListener('input', (e) => {
-        const valor = e.target.value;
-        if (valor) {
-            table.setFilter([[
-                { field: 'titulo', type: 'like', value: valor },
-                { field: 'genero', type: 'like', value: valor },
-            ]]);
-        } else {
-            table.clearFilter();
-        }
-    });
+    return table;
+}
+
+function editarPelicula(pelicula) {
+    const modalEl = document.getElementById('nuevaPeliculaModal');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+    document.getElementById('nuevaPeliculaTitulo').textContent = 'Editar película';
+    document.getElementById('btnGuardarPelicula').textContent = 'Guardar cambios';
+
+    document.getElementById('formNuevaPelicula').dataset.id = pelicula.id;
+
+    document.getElementById('npTitulo').value = pelicula.titulo;
+    document.getElementById('npDuracion').value = pelicula.duracionMinutos;
+    document.getElementById('npEstreno').value = pelicula.fechaEstreno
+        ? pelicula.fechaEstreno.substring(0, 10)
+        : '';
+
+    document.getElementById('npSinopsis').value = pelicula.sinopsis ?? '';
+
+    modal.show();
+}
+
+let tabla;
+
+async function cargarPeliculas() {
+    const r = await fetch('/api/peliculas', { headers: cabeceras() });
+    if (r.status === 401 || r.status === 403) {
+        window.location.href = '/index.html';
+        return;
+    }
+    if (!r.ok) {
+        mostrarError(await mensajeDeError(r, 'No se pudo cargar la lista de películas.'));
+        return;
+    }
+    const datos = (await r.json()).map(normalizar);
+    if (tabla) tabla.setData(datos);
+    else tabla = crearTabla(datos);
 }
 
 async function iniciar() {
-    // Solo Admin: si no lo es, vuelve al inicio
     if (!Sesion.tieneRol(datosActuales, 'Admin')) {
         window.location.href = '/index.html';
         return;
     }
     try {
-        const r = await fetch('/api/peliculas', { headers: cabeceras() });
-        if (r.status === 401 || r.status === 403) {
-            window.location.href = '/index.html';
-            return;
-        }
-        if (!r.ok) {
-            mostrarError(await mensajeDeError(r, 'No se pudo cargar la lista de películas.'));
-            return;
-        }
-        const peliculas = await r.json();
-        crearTabla(peliculas.map(normalizar));
+        await cargarPeliculas();
     } catch {
         mostrarError('No se pudo conectar con el servidor.');
     }
 }
 
 iniciar();
+
+(() => {
+    const modalEl = document.getElementById('nuevaPeliculaModal');
+    const form = document.getElementById('formNuevaPelicula');
+    const errorModal = document.getElementById('errorNuevaPelicula');
+    const btnGuardar = document.getElementById('btnGuardarPelicula');
+    const selGenero = document.getElementById('npGenero');
+    const selClasif = document.getElementById('npClasificacion');
+    const selEstado = document.getElementById('npEstado');
+
+    for (const e of ESTADOS) {
+        const o = document.createElement('option');
+        o.value = e;
+        o.textContent = e;
+        selEstado.appendChild(o);
+    }
+
+    function llenarSelect(select, items, texto) {
+        select.innerHTML = '<option value="">Sin especificar</option>';
+        for (const it of items) {
+            const o = document.createElement('option');
+            o.value = it.id;
+            o.textContent = it[texto];
+            select.appendChild(o);
+        }
+    }
+
+    function mostrarErrorModal(texto) {
+        errorModal.textContent = texto;
+        errorModal.classList.remove('d-none');
+    }
+
+    async function cargarCatalogos() {
+        try {
+            const [rg, rc] = await Promise.all([
+                fetch('/api/catalogo/generos', { headers: cabeceras() }),
+                fetch('/api/catalogo/clasificaciones', { headers: cabeceras() }),
+            ]);
+            if (!rg.ok || !rc.ok) throw new Error();
+            llenarSelect(selGenero, await rg.json(), 'nombreGenero');
+            llenarSelect(selClasif, await rc.json(), 'codigo');
+        } catch {
+            mostrarErrorModal('No se pudieron cargar géneros y clasificaciones.');
+        }
+    }
+
+    modalEl.addEventListener('show.bs.modal', async () => {
+        form.classList.remove('was-validated');
+        errorModal.classList.add('d-none');
+
+        await cargarCatalogos();
+
+        const id = form.dataset.id;
+
+        if (id) {
+            const pelicula = tabla.getData().find(p => p.id === Number(id));
+
+            if (pelicula) {
+                selGenero.value = pelicula.idGenero ?? '';
+                selClasif.value = pelicula.idClasificacion ?? '';
+                selEstado.value = pelicula.estado;
+            }
+        }
+    });
+    modalEl.addEventListener('hidden.bs.modal', () => {
+        form.reset();
+        delete form.dataset.id;
+
+        document.getElementById('nuevaPeliculaTitulo').textContent = 'Nueva película';
+        btnGuardar.textContent = 'Guardar';
+
+        form.classList.remove('was-validated');
+        errorModal.classList.add('d-none');
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        errorModal.classList.add('d-none');
+        form.classList.add('was-validated');
+
+        if (!form.checkValidity()) return;
+
+        const pelicula = {
+            titulo: document.getElementById('npTitulo').value.trim(),
+            duracionMinutos: Number(document.getElementById('npDuracion').value),
+            sinopsis: document.getElementById('npSinopsis').value.trim() || null,
+            fechaEstreno: document.getElementById('npEstreno').value || null,
+            idGenero: selGenero.value ? Number(selGenero.value) : null,
+            idClasificacion: selClasif.value ? Number(selClasif.value) : null,
+            estado: selEstado.value,
+        };
+
+        const id = form.dataset.id;
+        const editando = Boolean(id);
+
+        btnGuardar.disabled = true;
+
+        try {
+            const url = editando
+                ? `/api/peliculas/actualizarpelicula?id=${id}`
+                : '/api/peliculas';
+
+            const r = await fetch(url, {
+                method: editando ? 'PUT' : 'POST',
+                headers: {
+                    ...cabeceras(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(pelicula),
+            });
+
+            if (!r.ok) {
+                mostrarErrorModal(
+                    await mensajeDeError(
+                        r,
+                        editando
+                            ? 'No se pudo actualizar la película.'
+                            : 'No se pudo crear la película.'
+                    )
+                );
+                return;
+            }
+
+            bootstrap.Modal.getInstance(modalEl).hide();
+
+            await cargarPeliculas();
+
+        } catch {
+            mostrarErrorModal('No se pudo conectar con el servidor.');
+        } finally {
+            btnGuardar.disabled = false;
+        }
+    });
+})();

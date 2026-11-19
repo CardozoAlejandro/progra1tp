@@ -14,9 +14,36 @@ namespace CineWebApi.Controllers
     public class PeliculasController : ControllerBase
     {
         private readonly IPeliculaService _peliculaService;
-        public PeliculasController(IPeliculaService peliculaService)
+        private readonly IComprobanteService _comprobanteService;
+        public PeliculasController(IPeliculaService peliculaService, IComprobanteService comprobanteService)
         {
             _peliculaService = peliculaService;
+            _comprobanteService = comprobanteService;
+        }
+
+        [AllowAnonymous]
+        [HttpGet("mas-vendidas")]
+        public async Task<IActionResult> GetMasVendidas()
+        {
+            var ranking = await _comprobanteService.ObtenerIngresosPorPeliculaAsync();
+            var activas = (await _peliculaService.ObtenerPeliculasActivasAsync(null)).ToList();
+
+            var resultado = ranking
+                .Select(r => activas.FirstOrDefault(p =>
+                    string.Equals(p.Titulo, r.pelicula, StringComparison.OrdinalIgnoreCase)))
+                .OfType<Pelicula>()
+                .Take(6)
+                .Select(p => new PeliculaCarteleraDTO
+                {
+                    Id = p.Id,
+                    Titulo = p.Titulo,
+                    DuracionMinutos = p.DuracionMinutos,
+                    FechaEstreno = p.FechaEstreno,
+                    Genero = p.Genero?.NombreGenero,
+                    Clasificacion = p.Clasificacion?.Codigo
+                });
+
+            return Ok(resultado);
         }
 
         [Authorize(Roles = "Admin")]
@@ -86,6 +113,31 @@ namespace CineWebApi.Controllers
             }
 
             return Ok(new { mensaje = $"El estado de la pelicula {id} fue actualizado a '{estado}' correctamente." });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("actualizarpelicula")]
+        public async Task<IActionResult> UpdateMovie(int id, [FromBody] Pelicula pelicula)
+        {
+            if (id <= 0)
+            {
+                return BadRequest(new { mensaje = "El ID de la película no es válido." });
+            }
+
+            bool actualizado = await _peliculaService.ActualizarPeliculaAsync(id, pelicula);
+
+            if (!actualizado)
+            {
+                return BadRequest(new
+                {
+                    mensaje = "No se pudo actualizar la película. Verificá los datos ingresados."
+                });
+            }
+
+            return Ok(new
+            {
+                mensaje = "Película actualizada correctamente."
+            });
         }
     }
 }

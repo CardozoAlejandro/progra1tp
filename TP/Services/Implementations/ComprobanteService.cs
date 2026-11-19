@@ -76,7 +76,9 @@ namespace Cine_TP.Services.Implementations
             return _comprobanteRepository.DeleteComprobanteAsync(id);
         }
         public Task<List<(string pelicula, decimal total)>> ObtenerIngresosPorPeliculaAsync()
-                        => _comprobanteRepository.GetIngresosAsync();
+        {
+            return _comprobanteRepository.GetIngresosAsync();
+        }
 
         public async Task<List<(int anio, int mes, decimal total)>> ObtenerIngresosMensualesAsync()
         {

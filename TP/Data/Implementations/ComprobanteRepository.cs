@@ -166,7 +166,7 @@ namespace Cine_TP.Data.Implementations
         {
             var datos = await _context.ComprobanteDetalles
             .AsNoTracking()
-            .Where(d => d.Comprobante!.Estado == EstadoComprobante.Confirmado
+            .Where(d => d.Comprobante!.Estado == EstadoComprobante.Confirmada
                  && d.Comprobante.MontoTotal > 0)
             .GroupBy(d => new { d.Funcion!.IdPelicula, d.Funcion.Pelicula!.Titulo })
             .Select(g => new
@@ -185,7 +185,7 @@ namespace Cine_TP.Data.Implementations
         {
             var datos = await _context.Comprobantes
             .AsNoTracking()
-            .Where(c => c.Estado == EstadoComprobante.Confirmado)
+            .Where(c => c.Estado == EstadoComprobante.Confirmada)
             .Select(c => new { Fecha = c.FechaHoraEmision ?? c.FechaHoraCreacion, c.MontoFinal })
             .GroupBy(x => new { x.Fecha.Year, x.Fecha.Month })
             .Select(g => new

@@ -70,8 +70,13 @@
                             <i class="bi bi-list"></i>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="nav-icon bi bi-film"></i>
+                            <span class="d-none d-sm-inline">Cartelera</span>
+                        </a>
+                    </li>
                 </ul>
-
                 <ul class="navbar-nav ms-auto">
                     <!--begin::Color Mode Toggle-->
                     <li class="nav-item dropdown">
@@ -193,13 +198,13 @@
                             <!-- Subopciones -->
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="./listapeliculas.html" class="nav-link">
+                                    <a href="./listapeliculas.html" class="nav-link active">
                                         <i class="nav-icon bi bi-circle"></i>
                                         <p>Lista de películas</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="./estadisticas.html" class="nav-link active"
+                                    <a href="./estadisticas.html" class="nav-link"
                                        aria-current="page">
                                         <i class="nav-icon bi bi-circle"></i>
                                         <p>Estadísticas</p>
@@ -236,22 +241,14 @@
             <div class="app-content">
                 <div class="container-fluid">
                     <div id="errorPeliculas" class="alert alert-danger d-none" role="alert"></div>
-
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">Películas</h3>
                             <div class="card-tools">
-                                <div class="input-group input-group-sm" style="width: 16rem">
-                                    <span class="input-group-text">
-                                        <i class="bi bi-search" aria-hidden="true"></i>
-                                    </span>
-                                    <input id="table-filter"
-                                           type="search"
-                                           class="form-control"
-                                           placeholder="Buscar título o género..."
-                                           aria-label="Buscar título o género"
-                                           autocomplete="off" />
-                                </div>
+                                <button type="button" class="btn btn-primary btn-sm"
+                                        data-bs-toggle="modal" data-bs-target="#nuevaPeliculaModal">
+                                    <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Nueva película
+                                </button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -277,6 +274,61 @@
             </strong>
         </footer>
         <!--end::Footer-->
+        <div class="modal fade" id="nuevaPeliculaModal" tabindex="-1"
+             aria-labelledby="nuevaPeliculaTitulo" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="nuevaPeliculaTitulo">Nueva película</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <form id="formNuevaPelicula" novalidate>
+                        <div class="modal-body">
+                            <div id="errorNuevaPelicula" class="alert alert-danger d-none" role="alert"></div>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="npTitulo" class="form-label">Título</label>
+                                    <input id="npTitulo" class="form-control" maxlength="150" required />
+                                    <div class="invalid-feedback">El título es obligatorio.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="npDuracion" class="form-label">Duración (minutos)</label>
+                                    <input id="npDuracion" type="number" class="form-control" min="1" max="600" required />
+                                    <div class="invalid-feedback">Ingresá una duración entre 1 y 600.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="npEstreno" class="form-label">Fecha de estreno</label>
+                                    <input id="npEstreno" type="date" class="form-control" required />
+                                    <div class="invalid-feedback">La fecha de estreno es obligatoria.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="npGenero" class="form-label">Género</label>
+                                    <select id="npGenero" class="form-select" required></select>
+                                    <div class="invalid-feedback">Seleccioná un género.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="npClasificacion" class="form-label">Clasificación</label>
+                                    <select id="npClasificacion" class="form-select" required></select>
+                                    <div class="invalid-feedback">Seleccioná una clasificación.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="npEstado" class="form-label">Estado</label>
+                                    <select id="npEstado" class="form-select" required></select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="npSinopsis" class="form-label">Sinopsis</label>
+                                    <textarea id="npSinopsis" class="form-control" rows="4"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary" id="btnGuardarPelicula">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.16.0/browser/overlayscrollbars.browser.es6.min.js"
             crossorigin="anonymous"></script>
