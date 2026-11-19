@@ -67,17 +67,13 @@ namespace Cine_TP.Services.Implementations
             return _usuarioRepository.UserExistsAsync(usuario);
         }
 
-        public Task<Usuario?> ValidarUsuarioAsync(string nombreUsuario, string passwordHash)
+        public Task<bool> ActualizarEstadoUsuarioAsync(int id, bool estado)
         {
-            if (string.IsNullOrWhiteSpace(nombreUsuario))
+            if (id <= 0)
             {
-                return null;
+                return Task.FromResult(false);
             }
-            if (string.IsNullOrWhiteSpace(passwordHash))
-            {
-                return null;
-            }
-            return _usuarioRepository.ValidateUserAsync(nombreUsuario, passwordHash);
+            return _usuarioRepository.UpdateUserStateAsync(id, estado);
         }
     }
 }
