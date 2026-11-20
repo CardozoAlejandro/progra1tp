@@ -2,37 +2,37 @@
 <html lang="es">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Cine | Lista de usuarios</title>
+    <title>Cine | Acerca de</title>
 
     <script>
-                      (() => {
-                        'use strict';
-                        const root = document.documentElement;
-                        if (root.getAttribute('data-lte-color-mode') === 'off') {
-                          return;
-                        }
-                        const STORAGE_KEY = 'lte-theme';
-                        let stored = null;
-                        try {
-                          stored = localStorage.getItem(STORAGE_KEY);
-                        } catch {
-                          // localStorage puede no estar disponible
-                        }
-                        const authored = root.getAttribute('data-bs-theme');
-                        let resolved = 'light';
-                        if (stored === 'dark' || stored === 'light') {
-                          resolved = stored;
-                        } else if (authored === 'dark' || authored === 'light') {
-                          resolved = authored;
-                        } else if (globalThis.matchMedia('(prefers-color-scheme: dark)').matches) {
-                          resolved = 'dark';
-                        }
-                        root.setAttribute('data-bs-theme', resolved);
-                        root.style.colorScheme = resolved;
-                        if (resolved !== authored) {
-                          root.setAttribute('data-lte-theme-resolved', '');
-                        }
-                      })();
+              (() => {
+                'use strict';
+                const root = document.documentElement;
+                if (root.getAttribute('data-lte-color-mode') === 'off') {
+                  return;
+                }
+                const STORAGE_KEY = 'lte-theme';
+                let stored = null;
+                try {
+                  stored = localStorage.getItem(STORAGE_KEY);
+                } catch {
+                  // localStorage puede no estar disponible
+                }
+                const authored = root.getAttribute('data-bs-theme');
+                let resolved = 'light';
+                if (stored === 'dark' || stored === 'light') {
+                  resolved = stored;
+                } else if (authored === 'dark' || authored === 'light') {
+                  resolved = authored;
+                } else if (globalThis.matchMedia('(prefers-color-scheme: dark)').matches) {
+                  resolved = 'dark';
+                }
+                root.setAttribute('data-bs-theme', resolved);
+                root.style.colorScheme = resolved;
+                if (resolved !== authored) {
+                  root.setAttribute('data-lte-theme-resolved', '');
+                }
+              })();
     </script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
@@ -51,11 +51,7 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.16.0/styles/overlayscrollbars.min.css"
           crossorigin="anonymous" />
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/tabulator-tables@6.6.1/dist/css/tabulator_bootstrap5.min.css"
-          crossorigin="anonymous" />
     <link rel="stylesheet" href="./css/adminlte.css" />
-    <!-- Estilos propios (después de adminlte.css y tabulator para que ganen) -->
     <link rel="stylesheet" href="/css/cine.css" />
 </head>
 
@@ -68,6 +64,12 @@
                     <li class="nav-item">
                         <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button" aria-label="Mostrar u ocultar menú">
                             <i class="bi bi-list"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="nav-icon bi bi-film"></i>
+                            <span class="d-none d-sm-inline">Cartelera</span>
                         </a>
                     </li>
                 </ul>
@@ -168,7 +170,7 @@
 
                         <li class="nav-header">CUENTAS</li>
                         <li class="nav-item">
-                            <a href="./mi-cuenta.html" class="nav-link">
+                            <a href="./mi-cuenta.html" class="nav-link" data-requiere-sesion>
                                 <i class="nav-icon bi bi-person-circle"></i>
                                 <p>Mi cuenta</p>
                             </a>
@@ -182,25 +184,22 @@
                             </a>
                         </li>
                         <li class="nav-item d-none" data-solo-admin>
-                            <!-- Botón desplegable -->
-                            <a href="#" class="nav-link" role="button" aria-expanded="true">
+                            <a href="#" class="nav-link" role="button">
                                 <i class="nav-icon bi bi-film"></i>
                                 <p>
                                     Películas
                                     <i class="nav-arrow bi bi-chevron-right"></i>
                                 </p>
                             </a>
-                            <!-- Subopciones -->
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="./listapeliculas.html" class="nav-link active">
+                                    <a href="./listapeliculas.html" class="nav-link">
                                         <i class="nav-icon bi bi-circle"></i>
                                         <p>Lista de películas</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="./estadisticas.html" class="nav-link"
-                                       aria-current="page">
+                                    <a href="./estadisticas.html" class="nav-link">
                                         <i class="nav-icon bi bi-circle"></i>
                                         <p>Estadísticas</p>
                                     </a>
@@ -208,6 +207,14 @@
                             </ul>
                         </li>
                         <!--end::Panel de administrador-->
+
+                        <li class="nav-header">INFORMACIÓN</li>
+                        <li class="nav-item">
+                            <a href="./responsables.html" class="nav-link active" aria-current="page">
+                                <i class="nav-icon bi bi-info-circle"></i>
+                                <p>Acerca de</p>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             </div>
@@ -219,13 +226,13 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-sm-6">
-                            <h1 class="mb-0 fs-3">Lista de usuarios</h1>
+                            <h1 class="mb-0 fs-3">Acerca de</h1>
                         </div>
                         <div class="col-sm-6">
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb float-sm-end">
                                     <li class="breadcrumb-item"><a href="./index.html">Home</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Lista de usuarios</li>
+                                    <li class="breadcrumb-item active" aria-current="page">Acerca de</li>
                                 </ol>
                             </nav>
                         </div>
@@ -235,31 +242,80 @@
 
             <div class="app-content">
                 <div class="container-fluid">
-                    <div id="errorUsuarios" class="alert alert-danger d-none" role="alert"></div>
-
-                    <div class="card">
+                    <!--begin::Información del proyecto-->
+                    <div class="card mb-4">
                         <div class="card-header">
-                            <h3 class="card-title">Usuarios</h3>
-                            <div class="card-tools">
-                                <div class="input-group input-group-sm" style="width: 16rem">
-                                    <span class="input-group-text">
-                                        <i class="bi bi-search" aria-hidden="true"></i>
-                                    </span>
-                                    <input id="table-filter"
-                                           type="search"
-                                           class="form-control"
-                                           placeholder="Buscar usuario o email..."
-                                           aria-label="Buscar usuario o email"
-                                           autocomplete="off" />
-                                </div>
-                            </div>
+                            <h2 class="card-title fs-5 mb-0">
+                                <i class="bi bi-film me-2" aria-hidden="true"></i>Cine TUP – Trabajo Práctico Integrador
+                            </h2>
                         </div>
                         <div class="card-body">
-                            <div id="users-table" aria-label="Usuarios"></div>
-                            <div id="table-pagination"
-                                 class="d-flex flex-wrap gap-2 justify-content-end mt-2"></div>
+                            <p class="mb-3">
+                                Aplicación web para la gestión integral de un cine: consulta de cartelera y programación,
+                                reserva y compra de entradas, administración de películas y usuarios, y visualización de
+                                estadísticas de ventas.
+                            </p>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-3 col-lg-2">Asignatura</dt>
+                                <dd class="col-sm-9 col-lg-10">Programación II</dd>
+
+                                <dt class="col-sm-3 col-lg-2">Carrera</dt>
+                                <dd class="col-sm-9 col-lg-10">Tecnicatura Universitaria en Programación (TUP)</dd>
+
+                                <dt class="col-sm-3 col-lg-2">Institución</dt>
+                                <dd class="col-sm-9 col-lg-10">Universidad Tecnológica Nacional – Facultad Regional Córdoba (UTN FRC)</dd>
+
+                                <dt class="col-sm-3 col-lg-2">Tecnologías</dt>
+                                <dd class="col-sm-9 col-lg-10 mb-0">C# / ASP.NET Core Web API, Entity Framework Core, SQL Server, JWT, HTML5, CSS3, Bootstrap 5 / AdminLTE 4 y JavaScript</dd>
+                            </dl>
                         </div>
                     </div>
+                    <!--end::Información del proyecto-->
+
+                    <!--begin::Responsables del desarrollo-->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title fs-5 mb-0">
+                                <i class="bi bi-people me-2" aria-hidden="true"></i>Responsables del desarrollo
+                            </h2>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 60px">#</th>
+                                            <th>Nombre y Apellido</th>
+                                            <th style="width: 160px">Legajo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Alejandro Cardozo</td>
+                                            <td>430119</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>Alexis Cuevas</td>
+                                            <td>430660</td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>Juan Manco</td>
+                                            <td>430639</td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>Lisandro Sosa Luna</td>
+                                            <td>430170</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Responsables del desarrollo-->
                 </div>
             </div>
         </main>
@@ -267,7 +323,7 @@
         <!--begin::Footer-->
         <footer class="app-footer">
             <div class="float-end">
-                <a href="#" class="text-decoration-none">
+                <a href="./responsables.html" class="text-decoration-none">
                     <i class="bi bi-people me-1" aria-hidden="true"></i>Responsables
                 </a>
             </div>
@@ -285,20 +341,17 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
             crossorigin="anonymous"></script>
     <script src="./js/adminlte.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tabulator-tables@6.6.1/dist/js/tabulator.min.js"
-            crossorigin="anonymous"></script>
     <script src="/js/sesion.js"></script>
-    <script src="/js/listausuarios.js"></script>
     <script>
-                                  document.addEventListener('DOMContentLoaded', function () {
-                                    const sidebarWrapper = document.querySelector('.sidebar-wrapper');
-                                    const isMobile = window.innerWidth <= 992;
-                                    if (sidebarWrapper && globalThis.OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined && !isMobile) {
-                                      OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-                                        scrollbars: { theme: 'os-theme-light', autoHide: 'leave', clickScroll: true },
-                                      });
-                                    }
-                                  });
+              document.addEventListener('DOMContentLoaded', function () {
+                const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+                const isMobile = window.innerWidth <= 992;
+                if (sidebarWrapper && globalThis.OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined && !isMobile) {
+                  OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                    scrollbars: { theme: 'os-theme-light', autoHide: 'leave', clickScroll: true },
+                  });
+                }
+              });
     </script>
 </body>
 </html>
