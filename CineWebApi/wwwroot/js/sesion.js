@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     const CLAVE = 'cine_token';
     const CLAIM_ROL = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
     function leer() {
@@ -80,9 +80,20 @@
         });
     }
 
+    function pintarSesion() {
+        const haySesion = usuarioActual() !== null;
+        document.querySelectorAll('[data-solo-invitado]').forEach((el) => {
+            el.classList.toggle('d-none', haySesion);
+        });
+        document.querySelectorAll('[data-solo-sesion]').forEach((el) => {
+            el.classList.toggle('d-none', !haySesion);
+        });
+    }
+
     function pintarNavbar() {
         enlazarVolver();
         pintarAdmin();
+        pintarSesion();
         protegerEnlaces();
         const botones = document.getElementById('authButtons');
         const perfil = document.getElementById('menuPerfil');
