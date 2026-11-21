@@ -12,6 +12,7 @@ namespace Cine_TP.Data.Implementations
     public class ClienteRepository : IClienteRepository
     {
         private readonly CineDbContext _context;
+
         public ClienteRepository(CineDbContext context)
         {
             _context = context;
