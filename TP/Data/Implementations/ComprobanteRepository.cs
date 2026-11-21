@@ -113,7 +113,9 @@ namespace Cine_TP.Data.Implementations
 
         public async Task<bool> UpdateEstadoAsync(int id, string nuevoEstado)
         {
-            var comprobante = await _context.Comprobantes.FindAsync(id);
+            var comprobante = await _context.Comprobantes
+                    .Include(c => c.ComprobanteDetalles)
+                    .FirstOrDefaultAsync(c => c.Id == id);
             if (comprobante == null)
                 return false;
 
@@ -160,6 +162,72 @@ namespace Cine_TP.Data.Implementations
                     throw new InvalidOperationException(
                         $"La promoción '{promo.NombrePromo}' solo es válida de {promo.HoraInicio:hh\\:mm} a {promo.HoraFin:hh\\:mm}.");
             }
+        }
+
+        public async Task<List<(string pelicula, decimal total)>> GetIngresosAsync()
+        {
+            var datos = await _context.ComprobanteDetalles
+            .AsNoTracking()
+            .Where(d => d.Comprobante!.Estado == EstadoComprobante.Confirmada
+                 && d.Comprobante.MontoTotal > 0)
+            .GroupBy(d => new { d.Funcion!.IdPelicula, d.Funcion.Pelicula!.Titulo })
+            .Select(g => new
+            {
+                Pelicula = g.Key.Titulo,
+                Total = g.Sum(d => d.PrecioBase * d.Comprobante!.MontoFinal / d.Comprobante.MontoTotal)
+            })
+            .OrderByDescending(x => x.Total)
+            .Take(10)
+            .ToListAsync();
+
+            return datos.Select(x => (x.Pelicula, x.Total)).ToList();
+        }
+        
+        public async Task<List<(int anio, int mes, decimal total)>> GetIngresosMensualesAsync()
+        {
+            var datos = await _context.Comprobantes
+            .AsNoTracking()
+            .Where(c => c.Estado == EstadoComprobante.Confirmada)
+            .Select(c => new { Fecha = c.FechaHoraEmision ?? c.FechaHoraCreacion, c.MontoFinal })
+            .GroupBy(x => new { x.Fecha.Year, x.Fecha.Month })
+            .Select(g => new
+            {
+                g.Key.Year,
+                g.Key.Month,
+                Total = g.Sum(x => x.MontoFinal)
+            })
+            .OrderBy(x => x.Year).ThenBy(x => x.Month)
+            .ToListAsync();
+
+            return datos.Select(x => (x.Year, x.Month, x.Total)).ToList();
+        }
+
+        public async Task<int?> GetIdClienteAsync(int? idUsuario, string? nombreUsuario)
+        {
+            return await _context.Clientes
+                .AsNoTracking()
+                .Where(c => idUsuario != null
+                            ? c.IdUsuario == idUsuario
+                            : c.Usuario!.NombreUsuario == nombreUsuario)
+                .Select(c => (int?)c.Id)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> FormaPagoExistsAsync(int id)
+        {
+            return await _context.FormasPago.AsNoTracking().AnyAsync(f => f.Id == id);
+        }
+        public async Task<List<Comprobante>> GetComprobantesPorClienteAsync(int idCliente)
+        {
+            return await _context.Comprobantes
+                .AsNoTracking()
+                .Where(c => c.IdCliente == idCliente)
+                .Include(c => c.FormaPago)
+                .Include(c => c.Promocion)
+                .Include(c => c.ComprobanteDetalles).ThenInclude(d => d.Butaca)
+                .Include(c => c.ComprobanteDetalles).ThenInclude(d => d.Funcion).ThenInclude(f => f!.Pelicula)
+                .OrderByDescending(c => c.FechaHoraCreacion)
+                .ToListAsync();
         }
     }
 }

@@ -14,17 +14,62 @@ namespace CineWebApi.Controllers
     public class PeliculasController : ControllerBase
     {
         private readonly IPeliculaService _peliculaService;
-        public PeliculasController(IPeliculaService peliculaService)
+        private readonly IComprobanteService _comprobanteService;
+        public PeliculasController(IPeliculaService peliculaService, IComprobanteService comprobanteService)
         {
             _peliculaService = peliculaService;
+            _comprobanteService = comprobanteService;
         }
 
         [AllowAnonymous]
+        [HttpGet("mas-vendidas")]
+        public async Task<IActionResult> GetMasVendidas()
+        {
+            var ranking = await _comprobanteService.ObtenerIngresosPorPeliculaAsync();
+            var activas = (await _peliculaService.ObtenerPeliculasActivasAsync(null)).ToList();
+
+            var resultado = ranking
+                .Select(r => activas.FirstOrDefault(p =>
+                    string.Equals(p.Titulo, r.pelicula, StringComparison.OrdinalIgnoreCase)))
+                .OfType<Pelicula>()
+                .Take(6)
+                .Select(p => new PeliculaCarteleraDTO
+                {
+                    Id = p.Id,
+                    Titulo = p.Titulo,
+                    DuracionMinutos = p.DuracionMinutos,
+                    FechaEstreno = p.FechaEstreno,
+                    Genero = p.Genero?.NombreGenero,
+                    Clasificacion = p.Clasificacion?.Codigo
+                });
+
+            return Ok(resultado);
+        }
+
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var peliculas = await _peliculaService.ObtenerPeliculasAsync();
             return Ok(peliculas);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("en-cartelera")]
+        public async Task<IActionResult> GetAllActive([FromQuery(Name = "titulo")] string? nombrePelicula)
+        {
+            var peliculas = await _peliculaService.ObtenerPeliculasActivasAsync(nombrePelicula);
+            var resultado = peliculas.Select(p => new PeliculaCarteleraDTO
+            {
+                Id = p.Id,
+                Titulo = p.Titulo,
+                DuracionMinutos = p.DuracionMinutos,
+                FechaEstreno = p.FechaEstreno,
+                Genero = p.Genero?.NombreGenero,
+                Clasificacion = p.Clasificacion?.Codigo
+            });
+
+            return Ok(resultado);
         }
 
         [AllowAnonymous]
@@ -36,14 +81,6 @@ namespace CineWebApi.Controllers
             {
                 return NotFound(new { mensaje = $"No se encontró la película con ID {id}." });
             }
-            return Ok(pelicula);
-        }
-
-        [AllowAnonymous]
-        [HttpGet("buscar")]
-        public async Task<IActionResult> GetByName([FromQuery] string nombre)
-        {
-            var pelicula = await _peliculaService.ObtenerPeliculaPorNombreAsync(nombre);
             return Ok(pelicula);
         }
 
@@ -76,6 +113,51 @@ namespace CineWebApi.Controllers
             }
 
             return Ok(new { mensaje = $"El estado de la pelicula {id} fue actualizado a '{estado}' correctamente." });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("actualizarpelicula")]
+        public async Task<IActionResult> UpdateMovie(int id, [FromBody] Pelicula pelicula)
+        {
+            if (id <= 0)
+            {
+                return BadRequest(new { mensaje = "El ID de la película no es válido." });
+            }
+
+            bool actualizado = await _peliculaService.ActualizarPeliculaAsync(id, pelicula);
+
+            if (!actualizado)
+            {
+                return BadRequest(new
+                {
+                    mensaje = "No se pudo actualizar la película. Verificá los datos ingresados."
+                });
+            }
+
+            return Ok(new
+            {
+                mensaje = "Película actualizada correctamente."
+            });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{id}/detalle")]
+        public async Task<IActionResult> GetDetalle(int id)
+        {
+            var p = await _peliculaService.ObtenerPeliculaPorIdAsync(id);
+            if (p == null)
+                return NotFound(new { mensaje = $"No se encontró la película con ID {id}." });
+
+            return Ok(new PeliculaDetalleDTO
+            {
+                Id = p.Id,
+                Titulo = p.Titulo,
+                DuracionMinutos = p.DuracionMinutos,
+                Sinopsis = p.Sinopsis,
+                FechaEstreno = p.FechaEstreno,
+                Genero = p.Genero?.NombreGenero,
+                Clasificacion = p.Clasificacion?.Codigo
+            });
         }
     }
 }

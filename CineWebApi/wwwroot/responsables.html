@@ -1,0 +1,363 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Cine | Acerca de</title>
+
+    <script>
+              (() => {
+                'use strict';
+                const root = document.documentElement;
+                if (root.getAttribute('data-lte-color-mode') === 'off') {
+                  return;
+                }
+                const STORAGE_KEY = 'lte-theme';
+                let stored = null;
+                try {
+                  stored = localStorage.getItem(STORAGE_KEY);
+                } catch {
+                  // localStorage puede no estar disponible
+                }
+                const authored = root.getAttribute('data-bs-theme');
+                let resolved = 'light';
+                if (stored === 'dark' || stored === 'light') {
+                  resolved = stored;
+                } else if (authored === 'dark' || authored === 'light') {
+                  resolved = authored;
+                } else if (globalThis.matchMedia('(prefers-color-scheme: dark)').matches) {
+                  resolved = 'dark';
+                }
+                root.setAttribute('data-bs-theme', resolved);
+                root.style.colorScheme = resolved;
+                if (resolved !== authored) {
+                  root.setAttribute('data-lte-theme-resolved', '');
+                }
+              })();
+    </script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="preload" href="./css/adminlte.css" as="style" />
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.3.0/index.css"
+          integrity="sha256-5UwXtC6TaPHCAbVQ59waEAqOssHyhn/twyuLRRWszzo="
+          crossorigin="anonymous"
+          media="print"
+          onload="this.media = 'all'" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+          crossorigin="anonymous" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.16.0/styles/overlayscrollbars.min.css"
+          crossorigin="anonymous" />
+    <link rel="stylesheet" href="./css/adminlte.css" />
+    <link rel="stylesheet" href="/css/cine.css" />
+</head>
+
+<body class="layout-fixed sidebar-expand-lg sidebar-collapse bg-body-tertiary">
+    <div class="app-wrapper">
+        <!--begin::Header-->
+        <nav class="app-header navbar navbar-expand bg-body">
+            <div class="container-fluid">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button" aria-label="Mostrar u ocultar menú">
+                            <i class="bi bi-list"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="nav-icon bi bi-film"></i>
+                            <span class="d-none d-sm-inline">Cartelera</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav ms-auto">
+                    <!--begin::Color Mode Toggle-->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link"
+                           href="#"
+                           id="bd-theme"
+                           aria-label="Cambiar tema"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            <i class="bi bi-sun-fill" data-lte-theme-icon="light"></i>
+                            <i class="bi bi-moon-fill d-none" data-lte-theme-icon="dark"></i>
+                            <i class="bi bi-circle-half d-none" data-lte-theme-icon="auto"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end"
+                            aria-labelledby="bd-theme"
+                            style="--bs-dropdown-min-width: 8rem">
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                                    <i class="bi bi-sun-fill me-2"></i>
+                                    Light
+                                    <i class="bi bi-check-lg ms-auto d-none"></i>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                                    <i class="bi bi-moon-fill me-2"></i>
+                                    Dark
+                                    <i class="bi bi-check-lg ms-auto d-none"></i>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+                                    <i class="bi bi-circle-half me-2"></i>
+                                    Auto
+                                    <i class="bi bi-check-lg ms-auto d-none"></i>
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+                    <!--end::Color Mode Toggle-->
+                    <!--begin::Auth Buttons-->
+                    <li id="authButtons" class="nav-item d-flex align-items-center gap-2 ms-2">
+                        <a href="auth/register.html" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-person-plus me-1" aria-hidden="true"></i>
+                            <span class="d-none d-sm-inline">Registrarse</span>
+                        </a>
+                        <a href="auth/login.html" class="btn btn-primary btn-sm">
+                            <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>
+                            <span class="d-none d-sm-inline">Iniciar sesión</span>
+                        </a>
+                    </li>
+                    <!--end::Auth Buttons-->
+                    <!--begin::Perfil-->
+                    <li class="nav-item dropdown d-none" id="menuPerfil">
+                        <a class="nav-link d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="avatar-inicial" id="avatarPerfil" aria-hidden="true"></span>
+                            <span class="d-none d-md-inline" id="nombrePerfil"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="./mi-cuenta.html">Mi cuenta</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><button type="button" class="dropdown-item" id="cerrarSesion">Cerrar sesión</button></li>
+                        </ul>
+                    </li>
+                    <!--end::Perfil-->
+                </ul>
+            </div>
+        </nav>
+        <!--end::Header-->
+        <!--begin::Sidebar-->
+        <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+            <div class="sidebar-brand">
+                <a href="./index.html" class="brand-link">
+                    <i class="bi bi-film brand-image-icon ms-3 me-2" aria-hidden="true"></i>
+                    <span class="brand-text fw-light">Cine TUP</span>
+                </a>
+            </div>
+            <div class="sidebar-wrapper">
+                <nav class="mt-2" aria-label="Navegación principal">
+                    <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" data-accordion="false" id="navigation">
+                        <li class="nav-header">PELÍCULAS</li>
+                        <li class="nav-item">
+                            <a href="./index.html" class="nav-link">
+                                <i class="nav-icon bi bi-film"></i>
+                                <p>Cartelera</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="./programacion.html" class="nav-link">
+                                <i class="nav-icon bi bi-calendar3"></i>
+                                <p>Programación</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-header">CUENTAS</li>
+                        <li class="nav-item">
+                            <a href="./mi-cuenta.html" class="nav-link" data-requiere-sesion>
+                                <i class="nav-icon bi bi-person-circle"></i>
+                                <p>Mi cuenta</p>
+                            </a>
+                        </li>
+                        <!--begin::Panel de administrador (solo Admin)-->
+                        <li class="nav-header d-none" data-solo-admin>PANEL DE ADMINISTRADOR</li>
+                        <li class="nav-item d-none" data-solo-admin>
+                            <a href="./listausuarios.html" class="nav-link">
+                                <i class="nav-icon bi bi-people"></i>
+                                <p>Lista de usuarios</p>
+                            </a>
+                        </li>
+                        <li class="nav-item d-none" data-solo-admin>
+                            <a href="./comprobantes.html" class="nav-link">
+                                <i class="nav-icon bi bi-receipt"></i>
+                                <p>Comprobantes</p>
+                            </a>
+                        </li>
+                        <li class="nav-item d-none" data-solo-admin>
+                            <a href="#" class="nav-link" role="button">
+                                <i class="nav-icon bi bi-film"></i>
+                                <p>
+                                    Películas
+                                    <i class="nav-arrow bi bi-chevron-right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="./listapeliculas.html" class="nav-link">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Lista de películas</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="./estadisticas.html" class="nav-link">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Estadísticas</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!--end::Panel de administrador-->
+
+                        <li class="nav-header">INFORMACIÓN</li>
+                        <li class="nav-item">
+                            <a href="./responsables.html" class="nav-link active" aria-current="page">
+                                <i class="nav-icon bi bi-info-circle"></i>
+                                <p>Acerca de</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+        <!--end::Sidebar-->
+        <!--begin::App Main-->
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h1 class="mb-0 fs-3">Acerca de</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb float-sm-end">
+                                    <li class="breadcrumb-item"><a href="./index.html">Home</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Acerca de</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <!--begin::Información del proyecto-->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h2 class="card-title fs-5 mb-0">
+                                <i class="bi bi-film me-2" aria-hidden="true"></i>Cine TUP – Trabajo Práctico Integrador
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-3">
+                                Aplicación web para la gestión integral de un cine: consulta de cartelera y programación,
+                                reserva y compra de entradas, administración de películas y usuarios, y visualización de
+                                estadísticas de ventas.
+                            </p>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-3 col-lg-2">Asignatura</dt>
+                                <dd class="col-sm-9 col-lg-10">Programación II</dd>
+
+                                <dt class="col-sm-3 col-lg-2">Carrera</dt>
+                                <dd class="col-sm-9 col-lg-10">Tecnicatura Universitaria en Programación (TUP)</dd>
+
+                                <dt class="col-sm-3 col-lg-2">Institución</dt>
+                                <dd class="col-sm-9 col-lg-10">Universidad Tecnológica Nacional – Facultad Regional Córdoba (UTN FRC)</dd>
+
+                                <dt class="col-sm-3 col-lg-2">Tecnologías</dt>
+                                <dd class="col-sm-9 col-lg-10 mb-0">C# / ASP.NET Core Web API, Entity Framework Core, SQL Server, JWT, HTML5, CSS3, Bootstrap 5 / AdminLTE 4 y JavaScript</dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <!--end::Información del proyecto-->
+
+                    <!--begin::Responsables del desarrollo-->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title fs-5 mb-0">
+                                <i class="bi bi-people me-2" aria-hidden="true"></i>Responsables del desarrollo
+                            </h2>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 60px">#</th>
+                                            <th>Nombre y Apellido</th>
+                                            <th style="width: 160px">Legajo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Alejandro Cardozo</td>
+                                            <td>430119</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>Alexis Cuevas</td>
+                                            <td>430660</td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>Juan Manco</td>
+                                            <td>430639</td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>Lisandro Sosa Luna</td>
+                                            <td>430170</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Responsables del desarrollo-->
+                </div>
+            </div>
+        </main>
+        <!--end::App Main-->
+        <!--begin::Footer-->
+        <footer class="app-footer">
+            <div class="float-end">
+                <a href="./responsables.html" class="text-decoration-none">
+                    <i class="bi bi-people me-1" aria-hidden="true"></i>Responsables
+                </a>
+            </div>
+            <strong>
+                Copyright &copy; 2026-2026&nbsp;
+                <a href="https://uvs.frc.utn.edu.ar/" class="text-decoration-none">TUP</a>.
+            </strong>
+        </footer>
+        <!--end::Footer-->
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.16.0/browser/overlayscrollbars.browser.es6.min.js"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
+            crossorigin="anonymous"></script>
+    <script src="./js/adminlte.js"></script>
+    <script src="/js/sesion.js"></script>
+    <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+                const isMobile = window.innerWidth <= 992;
+                if (sidebarWrapper && globalThis.OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined && !isMobile) {
+                  OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                    scrollbars: { theme: 'os-theme-light', autoHide: 'leave', clickScroll: true },
+                  });
+                }
+              });
+    </script>
+</body>
+</html>

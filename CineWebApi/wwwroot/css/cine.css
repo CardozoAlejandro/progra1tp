@@ -92,3 +92,106 @@
     gap: 0.5rem;
     margin-top: 0.25rem;
 }
+
+.navbar .avatar-inicial {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #6c757d;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1;
+    user-select: none;
+}
+
+#users-table.tabulator,
+#users-table .tabulator-header {
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+}
+
+.form-select.estado-activo {
+    border-color: var(--bs-success);
+}
+
+.form-select.estado-suspendido {
+    border-color: #a6676b; 
+    color: #d4a5a8; 
+}
+
+.form-select.estado-suspendido:focus {
+    border-color: #c07f83;
+    box-shadow: 0 0 0 .2rem rgba(166, 103, 107, .25);
+}
+   
+.form-select.estado-suspendido option,
+.form-select.estado-activo option {
+    color: var(--bs-body-color);
+    background-color: var(--bs-body-bg);
+}
+
+.pelicula-titulo a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.pelicula-titulo a:hover,
+.pelicula-titulo a:focus-visible {
+    text-decoration: underline;
+}
+
+.compra-poster {
+    flex: 0 0 150px;
+    max-width: 150px;
+}
+
+.compra-chip {
+    background-color: #0b7fa6;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.35rem;
+}
+
+.compra-total {
+    background-color: #0b7fa6;
+    color: #fff;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.compra-total .monto {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.compra-temporizador {
+    min-width: 6rem;
+    padding: 0.4rem 1.25rem;
+    border-radius: 0.25rem;
+    background-color: #c62828;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.btn-compra {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #2a8b8b;
+    --bs-btn-border-color: #2a8b8b;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #237373;
+    --bs-btn-hover-border-color: #237373;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #2a8b8b;
+    --bs-btn-disabled-border-color: #2a8b8b;
+}

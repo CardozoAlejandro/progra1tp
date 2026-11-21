@@ -41,7 +41,7 @@ namespace CineWebApi.Controllers
             IdTipoPublico = c.IdTipoPublico
         };
 
-        [Authorize(Roles = "Cliente")]
+        [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetMio()
         {
@@ -55,7 +55,7 @@ namespace CineWebApi.Controllers
             return Ok(ADto(cliente));
         }
 
-        [Authorize(Roles = "Cliente")]
+        [Authorize]
         [HttpPut("me")]
         public async Task<IActionResult> ActualizarMio([FromBody] ActualizarPerfilClienteDTO dto)
         {
@@ -71,7 +71,6 @@ namespace CineWebApi.Controllers
 
             try
             {
-                // Nota: El DNI, fecha de nacimiento y tipo de público NO se modifican acá.
                 var actualizado = await _clienteService.ActualizarPerfilAsync(
                     IdClienteActual.Value,
                     dto.Nombre.Trim(),
@@ -91,7 +90,7 @@ namespace CineWebApi.Controllers
             }
         }
 
-        [Authorize(Roles = "Cliente")]
+        [Authorize]
         [HttpPut("me/password")]
         public async Task<IActionResult> CambiarPasswordMio([FromBody] CambiarPasswordDTO dto)
         {
@@ -155,17 +154,5 @@ namespace CineWebApi.Controllers
         }
     }
 
-    public class ActualizarPerfilClienteDTO
-    {
-        public string Nombre { get; set; } = string.Empty;
-        public string Apellido { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string? Telefono { get; set; }
-    }
 
-    public class CambiarPasswordDTO
-    {
-        public string PasswordActual { get; set; } = string.Empty;
-        public string PasswordNueva { get; set; } = string.Empty;
-    }
-}   
+}

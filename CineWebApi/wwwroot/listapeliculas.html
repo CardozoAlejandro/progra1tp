@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Cine | Lista de películas</title>
+
+    <script>
+                      (() => {
+                        'use strict';
+                        const root = document.documentElement;
+                        if (root.getAttribute('data-lte-color-mode') === 'off') {
+                          return;
+                        }
+                        const STORAGE_KEY = 'lte-theme';
+                        let stored = null;
+                        try {
+                          stored = localStorage.getItem(STORAGE_KEY);
+                        } catch {
+                          // localStorage puede no estar disponible
+                        }
+                        const authored = root.getAttribute('data-bs-theme');
+                        let resolved = 'light';
+                        if (stored === 'dark' || stored === 'light') {
+                          resolved = stored;
+                        } else if (authored === 'dark' || authored === 'light') {
+                          resolved = authored;
+                        } else if (globalThis.matchMedia('(prefers-color-scheme: dark)').matches) {
+                          resolved = 'dark';
+                        }
+                        root.setAttribute('data-bs-theme', resolved);
+                        root.style.colorScheme = resolved;
+                        if (resolved !== authored) {
+                          root.setAttribute('data-lte-theme-resolved', '');
+                        }
+                      })();
+    </script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="preload" href="./css/adminlte.css" as="style" />
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.3.0/index.css"
+          integrity="sha256-5UwXtC6TaPHCAbVQ59waEAqOssHyhn/twyuLRRWszzo="
+          crossorigin="anonymous"
+          media="print"
+          onload="this.media = 'all'" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+          crossorigin="anonymous" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.16.0/styles/overlayscrollbars.min.css"
+          crossorigin="anonymous" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/tabulator-tables@6.6.1/dist/css/tabulator_bootstrap5.min.css"
+          crossorigin="anonymous" />
+    <link rel="stylesheet" href="./css/adminlte.css" />
+    <!-- Estilos propios (después de adminlte.css y tabulator para que ganen) -->
+    <link rel="stylesheet" href="/css/cine.css" />
+</head>
+
+<body class="layout-fixed sidebar-expand-lg sidebar-collapse bg-body-tertiary">
+    <div class="app-wrapper">
+        <!--begin::Header-->
+        <nav class="app-header navbar navbar-expand bg-body">
+            <div class="container-fluid">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button" aria-label="Mostrar u ocultar menú">
+                            <i class="bi bi-list"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="nav-icon bi bi-film"></i>
+                            <span class="d-none d-sm-inline">Cartelera</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <!--begin::Color Mode Toggle-->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link"
+                           href="#"
+                           id="bd-theme"
+                           aria-label="Cambiar tema"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            <i class="bi bi-sun-fill" data-lte-theme-icon="light"></i>
+                            <i class="bi bi-moon-fill d-none" data-lte-theme-icon="dark"></i>
+                            <i class="bi bi-circle-half d-none" data-lte-theme-icon="auto"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end"
+                            aria-labelledby="bd-theme"
+                            style="--bs-dropdown-min-width: 8rem">
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                                    <i class="bi bi-sun-fill me-2"></i>
+                                    Light
+                                    <i class="bi bi-check-lg ms-auto d-none"></i>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                                    <i class="bi bi-moon-fill me-2"></i>
+                                    Dark
+                                    <i class="bi bi-check-lg ms-auto d-none"></i>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+                                    <i class="bi bi-circle-half me-2"></i>
+                                    Auto
+                                    <i class="bi bi-check-lg ms-auto d-none"></i>
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+                    <!--end::Color Mode Toggle-->
+                    <!--begin::Auth Buttons-->
+                    <li id="authButtons" class="nav-item d-flex align-items-center gap-2 ms-2">
+                        <a href="auth/register.html" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-person-plus me-1" aria-hidden="true"></i>
+                            <span class="d-none d-sm-inline">Registrarse</span>
+                        </a>
+                        <a href="auth/login.html" class="btn btn-primary btn-sm">
+                            <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>
+                            <span class="d-none d-sm-inline">Iniciar sesión</span>
+                        </a>
+                    </li>
+                    <!--end::Auth Buttons-->
+                    <!--begin::Perfil-->
+                    <li class="nav-item dropdown d-none" id="menuPerfil">
+                        <a class="nav-link d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="avatar-inicial" id="avatarPerfil" aria-hidden="true"></span>
+                            <span class="d-none d-md-inline" id="nombrePerfil"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="./mi-cuenta.html">Mi cuenta</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><button type="button" class="dropdown-item" id="cerrarSesion">Cerrar sesión</button></li>
+                        </ul>
+                    </li>
+                    <!--end::Perfil-->
+                </ul>
+            </div>
+        </nav>
+        <!--end::Header-->
+        <!--begin::Sidebar-->
+        <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+            <div class="sidebar-brand">
+                <a href="./index.html" class="brand-link">
+                    <i class="bi bi-film brand-image-icon ms-3 me-2" aria-hidden="true"></i>
+                    <span class="brand-text fw-light">Cine TUP</span>
+                </a>
+            </div>
+            <div class="sidebar-wrapper">
+                <nav class="mt-2" aria-label="Navegación principal">
+                    <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" data-accordion="false" id="navigation">
+                        <li class="nav-header">PELÍCULAS</li>
+                        <li class="nav-item">
+                            <a href="./index.html" class="nav-link">
+                                <i class="nav-icon bi bi-film"></i>
+                                <p>Cartelera</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="./programacion.html" class="nav-link">
+                                <i class="nav-icon bi bi-calendar3"></i>
+                                <p>Programación</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-header">CUENTAS</li>
+                        <li class="nav-item">
+                            <a href="./mi-cuenta.html" class="nav-link">
+                                <i class="nav-icon bi bi-person-circle"></i>
+                                <p>Mi cuenta</p>
+                            </a>
+                        </li>
+                        <!--begin::Panel de administrador (solo Admin)-->
+                        <li class="nav-header d-none" data-solo-admin>PANEL DE ADMINISTRADOR</li>
+                        <li class="nav-item d-none" data-solo-admin>
+                            <a href="./listausuarios.html" class="nav-link">
+                                <i class="nav-icon bi bi-people"></i>
+                                <p>Lista de usuarios</p>
+                            </a>
+                        </li>
+                        <li class="nav-item d-none" data-solo-admin>
+                            <a href="./comprobantes.html" class="nav-link">
+                                <i class="nav-icon bi bi-receipt"></i>
+                                <p>Comprobantes</p>
+                            </a>
+                        </li>
+                        <li class="nav-item d-none" data-solo-admin>
+                            <!-- Botón desplegable -->
+                            <a href="#" class="nav-link" role="button" aria-expanded="true">
+                                <i class="nav-icon bi bi-film"></i>
+                                <p>
+                                    Películas
+                                    <i class="nav-arrow bi bi-chevron-right"></i>
+                                </p>
+                            </a>
+                            <!-- Subopciones -->
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="./listapeliculas.html" class="nav-link active">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Lista de películas</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="./estadisticas.html" class="nav-link"
+                                       aria-current="page">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Estadísticas</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!--end::Panel de administrador-->
+                        <li class="nav-header">INFORMACIÓN</li>
+                        <li class="nav-item">
+                            <a href="./responsables.html" class="nav-link">
+                                <i class="nav-icon bi bi-info-circle"></i>
+                                <p>Acerca de</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+        <!--end::Sidebar-->
+        <!--begin::App Main-->
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h1 class="mb-0 fs-3">Lista de películas</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb float-sm-end">
+                                    <li class="breadcrumb-item"><a href="./index.html">Home</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Lista de películas</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="container-fluid">
+                    <div id="errorPeliculas" class="alert alert-danger d-none" role="alert"></div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Películas</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-primary btn-sm"
+                                        data-bs-toggle="modal" data-bs-target="#nuevaPeliculaModal">
+                                    <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Nueva película
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="users-table" aria-label="Películas"></div>
+                            <div id="table-pagination"
+                                 class="d-flex flex-wrap gap-2 justify-content-end mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!--end::App Main-->
+        <!--begin::Footer-->
+        <footer class="app-footer">
+            <div class="float-end">
+                <a href="./responsables.html" class="text-decoration-none">
+                    <i class="bi bi-people me-1" aria-hidden="true"></i>Responsables
+                </a>
+            </div>
+            <strong>
+                Copyright &copy; 2026-2026&nbsp;
+                <a href="https://uvs.frc.utn.edu.ar/" class="text-decoration-none">TUP</a>.
+            </strong>
+        </footer>
+        <!--end::Footer-->
+        <div class="modal fade" id="nuevaPeliculaModal" tabindex="-1"
+             aria-labelledby="nuevaPeliculaTitulo" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="nuevaPeliculaTitulo">Nueva película</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <form id="formNuevaPelicula" novalidate>
+                        <div class="modal-body">
+                            <div id="errorNuevaPelicula" class="alert alert-danger d-none" role="alert"></div>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="npTitulo" class="form-label">Título</label>
+                                    <input id="npTitulo" class="form-control" maxlength="150" required />
+                                    <div class="invalid-feedback">El título es obligatorio.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="npDuracion" class="form-label">Duración (minutos)</label>
+                                    <input id="npDuracion" type="number" class="form-control" min="1" max="600" required />
+                                    <div class="invalid-feedback">Ingresá una duración entre 1 y 600.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="npEstreno" class="form-label">Fecha de estreno</label>
+                                    <input id="npEstreno" type="date" class="form-control" required />
+                                    <div class="invalid-feedback">La fecha de estreno es obligatoria.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="npGenero" class="form-label">Género</label>
+                                    <select id="npGenero" class="form-select" required></select>
+                                    <div class="invalid-feedback">Seleccioná un género.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="npClasificacion" class="form-label">Clasificación</label>
+                                    <select id="npClasificacion" class="form-select" required></select>
+                                    <div class="invalid-feedback">Seleccioná una clasificación.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="npEstado" class="form-label">Estado</label>
+                                    <select id="npEstado" class="form-select" required></select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="npSinopsis" class="form-label">Sinopsis</label>
+                                    <textarea id="npSinopsis" class="form-control" rows="4"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary" id="btnGuardarPelicula">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.16.0/browser/overlayscrollbars.browser.es6.min.js"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
+            crossorigin="anonymous"></script>
+    <script src="./js/adminlte.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tabulator-tables@6.6.1/dist/js/tabulator.min.js"
+            crossorigin="anonymous"></script>
+    <script src="/js/sesion.js"></script>
+    <script src="/js/listapeliculas.js"></script>
+    <script>
+                                  document.addEventListener('DOMContentLoaded', function () {
+                                    const sidebarWrapper = document.querySelector('.sidebar-wrapper');
+                                    const isMobile = window.innerWidth <= 992;
+                                    if (sidebarWrapper && globalThis.OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined && !isMobile) {
+                                      OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                                        scrollbars: { theme: 'os-theme-light', autoHide: 'leave', clickScroll: true },
+                                      });
+                                    }
+                                  });
+    </script>
+</body>
+</html>

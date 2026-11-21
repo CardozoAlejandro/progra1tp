@@ -54,10 +54,18 @@ namespace Cine_TP.Data.Implementations
             return await _context.Usuarios
                                  .AnyAsync(u => u.Email == email);
         }
-        public async Task<Usuario?> ValidateUserAsync(string nombreUsuario, string passwordHash)
+        public async Task<bool> UpdateUserStateAsync(int id, bool estado)
         {
-            return await _context.Usuarios
-                                 .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario && u.PasswordHash == passwordHash);
+            var usuario = await _context.Usuarios
+                                         .Where(u => u.Id == id)
+                                         .FirstOrDefaultAsync();
+            if (usuario == null)
+            {
+                return false;
+            }
+            usuario.Activo = estado;
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<bool> CreateUserAsync(Usuario usuario)

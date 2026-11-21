@@ -19,7 +19,7 @@ namespace Cine_TP.Services.Implementations
 
         public Task<bool> ActualizarEstadoPeliculaAsync(int id, string estado)
         {
-            if(id <= 0 || !EstadoPelicula.Validos.Contains(estado))
+            if (id <= 0 || !EstadoPelicula.Validos.Contains(estado))
             {
                 return Task.FromResult(false);
             }
@@ -28,7 +28,7 @@ namespace Cine_TP.Services.Implementations
 
         public Task<bool> ActualizarPeliculaAsync(int id, Pelicula pelicula)
         {
-            if(!ValidarPelicula(pelicula))
+            if (!ValidarPelicula(pelicula))
             {
                 return Task.FromResult(false);
             }
@@ -37,7 +37,7 @@ namespace Cine_TP.Services.Implementations
 
         public Task<bool> CrearPeliculaAsync(Pelicula pelicula)
         {
-            if(!ValidarPelicula(pelicula))
+            if (!ValidarPelicula(pelicula))
             {
                 return Task.FromResult(false);
             }
@@ -46,16 +46,16 @@ namespace Cine_TP.Services.Implementations
 
         public async Task<Pelicula?> ObtenerPeliculaPorIdAsync(int id)
         {
-            if(id <= 0)
+            if (id <= 0)
             {
                 return null;
             }
             return await _peliculaRepository.GetMovieByIdAsync(id);
         }
 
-        public Task<List<Pelicula>> ObtenerPeliculaPorNombreAsync(string nombrePelicula)
+        public Task<List<Pelicula>> ObtenerPeliculasActivasAsync(string? nombrePelicula = null)
         {
-            return _peliculaRepository.GetMovieByNameAsync(nombrePelicula);
+            return _peliculaRepository.GetAllActiveMoviesAsync(nombrePelicula);
         }
 
         public Task<List<Pelicula>> ObtenerPeliculasAsync()
@@ -69,30 +69,32 @@ namespace Cine_TP.Services.Implementations
             {
                 return false;
             }
+
             if (string.IsNullOrWhiteSpace(pelicula.Titulo))
             {
                 return false;
             }
-            if (pelicula.DuracionMinutos < 0)
+
+            if (pelicula.DuracionMinutos <= 0)
             {
                 return false;
             }
-            if (string.IsNullOrWhiteSpace(pelicula.Sinopsis))
+
+            if (pelicula.FechaEstreno is null)
             {
                 return false;
             }
-            if (pelicula.FechaEstreno is null || pelicula.FechaEstreno > DateTime.Now)
-            {
-                return false;
-            }
+
             if (!EstadoPelicula.Validos.Contains(pelicula.Estado))
             {
                 return false;
             }
+
             if (pelicula.IdGenero is null || pelicula.IdGenero <= 0)
             {
                 return false;
             }
+
             if (pelicula.IdClasificacion is null || pelicula.IdClasificacion <= 0)
             {
                 return false;

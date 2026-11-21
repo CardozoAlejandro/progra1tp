@@ -1,4 +1,4 @@
-﻿using Cine_TP.Data.Interfaces;
+using Cine_TP.Data.Interfaces;
 using Cine_TP.Domain;
 using Cine_TP.Services.Interfaces;
 using System;
@@ -12,7 +12,6 @@ namespace Cine_TP.Services.Implementations
     public class ClienteService : IClienteService
     {
         private readonly IClienteRepository _clienteRepository;
-
         public ClienteService(IClienteRepository clienteRepository)
         {
             _clienteRepository = clienteRepository;
@@ -20,7 +19,7 @@ namespace Cine_TP.Services.Implementations
 
         public Task<Cliente?> ObtenerClientePorDniAsync(string dni)
         {
-            if (string.IsNullOrWhiteSpace(dni))
+            if(string.IsNullOrWhiteSpace(dni))
             {
                 return Task.FromResult<Cliente?>(null);
             }
@@ -30,7 +29,7 @@ namespace Cine_TP.Services.Implementations
 
         public Task<Cliente?> ObtenerClientePorIdAsync(int id)
         {
-            if (id <= 0)
+            if(id <= 0)
             {
                 return Task.FromResult<Cliente?>(null);
             }
@@ -41,7 +40,6 @@ namespace Cine_TP.Services.Implementations
         {
             return _clienteRepository.GetAllAsync();
         }
-
         public async Task<Cliente?> ActualizarPerfilAsync(int idCliente, string nombre, string apellido, string email, string? telefono)
         {
             if (idCliente <= 0)
