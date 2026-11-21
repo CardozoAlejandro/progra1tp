@@ -1,4 +1,4 @@
-﻿using Cine_TP.Domain;
+using Cine_TP.Domain;
 using Cine_TP.Services.Interfaces;
 using CineWebApi.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -153,6 +153,7 @@ namespace CineWebApi.Controllers
             return Ok(ADto(cliente));
         }
     }
+
 
 
 }
